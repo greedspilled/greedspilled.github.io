@@ -114,6 +114,46 @@
   background-image: url("./icons/greed%20assets/home.jpg");
 }
 
+.ax-workspace__empty {
+  background:
+    linear-gradient(rgb(0 0 0 / 48%), rgb(0 0 0 / 58%)),
+    url("./icons/greed%20assets/bacground.gif") center / cover no-repeat;
+  color: var(--greed-color, #fff);
+}
+
+.ax-workspace__empty::before,
+.ax-frame:has(> .ax-frame__view[title="Browser tab"]:not([src]))::after {
+  color: var(--greed-color, #fff);
+  content: "Br0wss3r";
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-shadow: 0 4px 28px rgb(0 0 0 / 75%);
+}
+
+.ax-workspace__empty p {
+  display: none;
+}
+
+.ax-frame:has(> .ax-frame__view[title="Browser tab"]:not([src])) > .ax-frame__view {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ax-frame:has(> .ax-frame__view[title="Browser tab"]:not([src]))::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(rgb(0 0 0 / 48%), rgb(0 0 0 / 58%)),
+    url("./icons/greed%20assets/bacground.gif") center / cover no-repeat;
+  pointer-events: none;
+}
+
 a[href*="discord."],
 a[href*="tiktok.com"],
 .omni-discord {
