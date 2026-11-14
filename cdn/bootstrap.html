@@ -28,10 +28,9 @@
           "./index.html",
           "https://cdn.jsdelivr.net/gh/UnblockableMan/greed-static@main/cdn/index.html",
           "https://testingcf.jsdelivr.net/gh/UnblockableMan/greed-static@main/cdn/index.html",
-          "https://gcore.jsdelivr.net/gh/UnblockableMan/greed-static@main/cdn/index.html",
           "https://raw.githubusercontent.com/UnblockableMan/greed-static/main/cdn/index.html",
-          "https://cdn.statically.io/gh/UnblockableMan/greed-static/main/cdn/index.html",
           "https://esm.sh/gh/UnblockableMan/greed-static@main/cdn/index.html",
+          "https://cdn.statically.io/gh/UnblockableMan/greed-static/main/cdn/index.html",
         ];
         const frame = document.createElement("iframe");
         frame.allow = "fullscreen";
@@ -48,7 +47,9 @@
 
           const url = new URL(source, location.href);
           url.searchParams.set("d", cacheBust);
-          fetch(url.href, { cache: "no-store" })
+          const controller = new AbortController();
+          const timeout = window.setTimeout(() => controller.abort(), 12000);
+          fetch(url.href, { cache: "no-store", signal: controller.signal })
             .then((response) => {
               if (!response.ok) throw new Error(`Loader returned ${response.status}`);
               return response.text();
@@ -67,7 +68,8 @@
                 `<head><base href="${baseUrl}">${selfUrlScript}`,
               );
             })
-            .catch(loadNext);
+            .catch(loadNext)
+            .finally(() => window.clearTimeout(timeout));
         };
 
         loadNext();
