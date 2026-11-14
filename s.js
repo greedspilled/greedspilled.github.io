@@ -15,7 +15,7 @@ async function reviveRoute(event) {
 }
 
 self.addEventListener('message', (event) => {
-  const prefix = event.data?.$arctic$keepalive?.prefix
+  const prefix = event.data?.$greed$keepalive?.prefix
   if (typeof prefix !== 'string' || event.source === null) return
   let alive = false
   try {
@@ -23,7 +23,7 @@ self.addEventListener('message', (event) => {
     alive = self.$scramjetController.shouldRoute({ request: { url } })
   } catch {
   }
-  event.source.postMessage({ $arctic$controller: { prefix, alive } })
+  event.source.postMessage({ $greed$controller: { prefix, alive } })
 })
 
 self.addEventListener('install', () => self.skipWaiting())
