@@ -1,0 +1,113 @@
+.greed-ai-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 0 var(--space-3);
+}
+
+.greed-ai-persona-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.greed-ai-persona,
+.greed-ai-custom-persona,
+.greed-ai-prompts-toggle {
+  min-height: 38px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-round);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.greed-ai-persona,
+.greed-ai-custom-persona {
+  padding: 0 var(--space-3);
+}
+
+.greed-ai-persona:focus-visible,
+.greed-ai-custom-persona:focus-visible,
+.greed-ai-prompts-toggle:focus-visible,
+.greed-ai-prompt:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.greed-ai-custom-persona {
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+
+.greed-ai-prompts-toggle {
+  padding: 0 var(--space-4);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.greed-ai-prompts-toggle:hover,
+.greed-ai-prompt:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.greed-ai-prompts[hidden] {
+  display: none;
+}
+
+.greed-ai-prompts {
+  flex-basis: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.greed-ai-prompts h2 {
+  margin: 0 0 var(--space-2);
+  color: var(--text);
+  font-size: var(--text-sm);
+}
+
+.greed-ai-prompt-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--space-2);
+}
+
+.greed-ai-prompt {
+  min-height: 42px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .greed-ai-tools {
+    align-items: stretch;
+  }
+
+  .greed-ai-persona-label {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+
+  .greed-ai-persona {
+    flex: 1;
+  }
+
+  .greed-ai-prompts-toggle {
+    flex: 1;
+  }
+}
