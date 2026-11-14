@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="Greed, the need to have more." />
+    <title>Greed</title>
+    <link rel="icon" href="../assets/icons/greed%20assets/logo.svg" type="image/svg+xml" />
+    <style>
+      html,
+      body,
+      iframe {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      (() => {
+        const rootId = "greed-root";
+        const cacheBust = Date.now();
+        const sources = [
+          "./index.html",
+          "https://cdn.jsdelivr.net/gh/UnblockableMan/greed-static@main/cdn/index.html",
+          "https://testingcf.jsdelivr.net/gh/UnblockableMan/greed-static@main/cdn/index.html",
+          "https://gcore.jsdelivr.net/gh/UnblockableMan/greed-static@main/cdn/index.html",
+          "https://raw.githubusercontent.com/UnblockableMan/greed-static/main/cdn/index.html",
+          "https://cdn.statically.io/gh/UnblockableMan/greed-static/main/cdn/index.html",
+          "https://esm.sh/gh/UnblockableMan/greed-static@main/cdn/index.html",
+        ];
+        const frame = document.createElement("iframe");
+        frame.allow = "fullscreen";
+        frame.title = "Greed";
+        frame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:0";
+        document.body.append(frame);
+
+        const loadNext = () => {
+          const source = sources.shift();
+          if (!source) {
+            document.body.textContent = "Could not load Greed.";
+            return;
+          }
+
+          const url = new URL(source, location.href);
+          url.searchParams.set("d", cacheBust);
+          fetch(url.href, { cache: "no-store" })
+            .then((response) => {
+              if (!response.ok) throw new Error(`Loader returned ${response.status}`);
+              return response.text();
+            })
+            .then((html) => {
+              if (!html.includes(rootId)) throw new Error("Greed app root was not found");
+              const selfUrl = new URL(location.href).href;
+              const baseUrl = new URL(".", url).href;
+              const selfUrlScript =
+                '<script>window.__GREED_SELF_URL=' +
+                JSON.stringify(selfUrl) +
+                ";</" +
+                "script>";
+              frame.srcdoc = html.replace(
+                /<head>/i,
+                `<head><base href="${baseUrl}">${selfUrlScript}`,
+              );
+            })
+            .catch(loadNext);
+        };
+
+        loadNext();
+      })();
+    </script>
+  </body>
+</html>
