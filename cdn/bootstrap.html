@@ -56,7 +56,7 @@
             .then((html) => {
               if (!html.includes(rootId)) throw new Error("Greed app root was not found");
               const selfUrl = new URL(location.href).href;
-              const baseUrl = new URL(".", url).href;
+              const baseUrl = new URL("..", url).href;
               const selfUrlScript =
                 '<script>window.__GREED_SELF_URL=' +
                 JSON.stringify(selfUrl) +
