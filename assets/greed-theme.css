@@ -32,8 +32,8 @@
 }
 
 .greed-greed-brand {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   background: center / contain no-repeat
     url("./icons/greed%20assets/logo.svg");
 }
@@ -45,8 +45,8 @@
 
 .greed-greed-item::before {
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 4px;
   background-position: center;
   background-repeat: no-repeat;
@@ -169,8 +169,8 @@
 }
 
 .app-card-icon {
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
 }
 
 .app-card-img {
@@ -249,8 +249,8 @@ a[href*="tiktok.com"],
 
 .wordmark::before {
   display: block;
-  width: clamp(120px, 22vw, 176px);
-  height: clamp(78px, 14vw, 112px);
+  width: clamp(136px, 24vw, 208px);
+  height: clamp(88px, 15.5vw, 132px);
   background: center / contain no-repeat
     url("./icons/greed%20assets/logo.svg");
   content: "";
@@ -270,8 +270,8 @@ a[href*="tiktok.com"],
   }
 
   .greed-greed-item::before {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
   }
 }
 
