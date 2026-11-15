@@ -4,32 +4,32 @@ const personas = {
   balanced: {
     label: "Balanced",
     instruction:
-      "You are Greed AI, a helpful and thoughtful assistant. Be clear, accurate, and adapt your detail to the user's needs.",
+      "You are GREEDGPT, a helpful and thoughtful assistant. Be clear, accurate, and adapt your detail to the user's needs.",
   },
   tutor: {
     label: "Tutor",
     instruction:
-      "You are Greed AI in tutor mode. Explain ideas in approachable steps, ask brief questions when useful, and help the user learn instead of simply doing their work for them.",
+      "You are GREEDGPT in tutor mode. Explain ideas in approachable steps, ask brief questions when useful, and help the user learn instead of simply doing their work for them.",
   },
   concise: {
     label: "Concise",
     instruction:
-      "You are Greed AI in concise mode. Lead with the answer, use plain language, and avoid unnecessary detail.",
+      "You are GREEDGPT in concise mode. Lead with the answer, use plain language, and avoid unnecessary detail.",
   },
   creative: {
     label: "Creative",
     instruction:
-      "You are Greed AI in creative mode. Offer imaginative options, make your assumptions clear, and help the user develop their ideas.",
+      "You are GREEDGPT in creative mode. Offer imaginative options, make your assumptions clear, and help the user develop their ideas.",
   },
   coding: {
     label: "Coding coach",
     instruction:
-      "You are Greed AI in coding-coach mode. Explain the reasoning behind suggestions, prefer small reliable changes, and include code only when it helps.",
+      "You are GREEDGPT in coding-coach mode. Explain the reasoning behind suggestions, prefer small reliable changes, and include code only when it helps.",
   },
   socratic: {
     label: "Socratic",
     instruction:
-      "You are Greed AI in Socratic mode. Guide the user with focused questions and hints, revealing a direct answer when they ask for one.",
+      "You are GREEDGPT in Socratic mode. Guide the user with focused questions and hints, revealing a direct answer when they ask for one.",
   },
   custom: {
     label: "Custom",
@@ -56,7 +56,7 @@ function loadPreference(key, fallback) {
   try {
     return window.localStorage.getItem(key) ?? fallback;
   } catch (error) {
-    console.error(`Could not read the Greed AI preference "${key}".`, error);
+    console.error(`Could not read the GREEDGPT preference "${key}".`, error);
     return fallback;
   }
 }
@@ -65,7 +65,7 @@ function savePreference(key, value) {
   try {
     window.localStorage.setItem(key, value);
   } catch (error) {
-    console.error(`Could not save the Greed AI preference "${key}".`, error);
+    console.error(`Could not save the GREEDGPT preference "${key}".`, error);
   }
 }
 
@@ -95,12 +95,12 @@ function installPersonaContext() {
       init?.method === "POST"
     ) {
       if (typeof init.body !== "string") {
-        throw new Error("Greed AI could not apply the selected persona.");
+        throw new Error("GREEDGPT could not apply the selected persona.");
       }
 
       const payload = JSON.parse(init.body);
       if (!Array.isArray(payload.messages)) {
-        throw new Error("Greed AI received an invalid conversation.");
+        throw new Error("GREEDGPT received an invalid conversation.");
       }
 
       payload.messages = [
@@ -140,7 +140,7 @@ function makePersonaTools(surface) {
   customInput.className = "greed-ai-custom-persona";
   customInput.type = "text";
   customInput.maxLength = 500;
-  customInput.placeholder = "Describe a style for Greed AI";
+  customInput.placeholder = "Describe a style for GREEDGPT";
   customInput.setAttribute("aria-label", "Custom AI personality");
   customInput.value = customPersona;
   customInput.hidden = selectedPersona !== "custom";
@@ -175,7 +175,7 @@ function makePersonaTools(surface) {
         "value",
       )?.set;
       if (!setter) {
-        throw new Error("Greed AI could not fill the prompt field.");
+        throw new Error("GREEDGPT could not fill the prompt field.");
       }
       setter.call(input, prompt);
       input.dispatchEvent(new Event("input", { bubbles: true }));

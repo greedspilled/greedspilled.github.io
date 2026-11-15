@@ -7,9 +7,10 @@ const footerMessages = [
 ];
 
 const labelReplacements = new Map([
-  ["AI", "A!"],
-  ["Browser", "Br0ws3r"],
-  ["Chat", "Ch@t"],
+  ["AI", "GREEDGPT"],
+  ["Browser", "Greedle"],
+  ["Chat", "Griscord"],
+  ["G@mes", "gs5"],
 ]);
 
 let footerIndex = 0;
@@ -172,6 +173,16 @@ function updateFooter() {
   }, 180);
 }
 
+function syncAiBranding() {
+  for (const heading of document.querySelectorAll(
+    ".ai-head-title h1, .ai-empty h2",
+  )) {
+    if (heading.textContent.trim().toLowerCase() === "greed ai") {
+      heading.textContent = "GREEDGPT";
+    }
+  }
+}
+
 function applyRebrand() {
   if (document.title !== "Greed") document.title = "Greed";
 
@@ -200,6 +211,7 @@ function applyRebrand() {
 
   updateFooter();
   syncAppearancePanel();
+  syncAiBranding();
 }
 
 const observer = new MutationObserver(() => {

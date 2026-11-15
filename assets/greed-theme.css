@@ -77,8 +77,22 @@
   background-image: url("./icons/greed%20assets/chat.jpg");
 }
 
-.greed-greed-list > li:nth-child(7) > .greed-greed-item::before {
+.greed-music-nav::before {
+  display: none;
+}
+
+.greed-greed-list > li:nth-child(8) > .greed-greed-item::before {
   background-image: url("./icons/greed%20assets/settings.jpg");
+}
+
+.greed-music-nav__icon {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 4px;
+  background: center / cover no-repeat
+    url("./icons/greed%20assets/music.jpg");
+  mix-blend-mode: screen;
 }
 
 .ax-address__icon-btn[aria-label="Go back"] svg,
@@ -124,7 +138,7 @@
 .ax-workspace__empty::before,
 .ax-frame:has(> .ax-frame__view[title="Browser tab"]:not([src]))::after {
   color: var(--greed-color, #fff);
-  content: "Br0wss3r";
+  content: "Greedle";
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 7vw, 5rem);
   font-weight: 700;
@@ -400,6 +414,504 @@ a[href*="tiktok.com"],
   font-size: var(--text-sm);
 }
 
+.greed-music-surface {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background:
+    radial-gradient(ellipse at 50% -18%, rgb(255 255 255 / 8%), transparent 58%),
+    var(--bg-base);
+}
+
+.greedified {
+  box-sizing: border-box;
+  display: flex;
+  width: min(1120px, 100%);
+  min-height: 100%;
+  flex: 1;
+  flex-direction: column;
+  gap: 24px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 48px);
+}
+
+.greedified-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.greedified-logo {
+  width: 68px;
+  height: 68px;
+  flex: none;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  box-shadow: var(--shadow-md);
+}
+
+.greedified-heading {
+  min-width: 0;
+  flex: 1;
+}
+
+.greedified-heading h1 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5vw, 48px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.greedified-heading p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.greedified-add,
+.greedified-add-url,
+.greedified-download {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-round);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  transition:
+    background var(--fx-fast) var(--fx-ease),
+    transform var(--fx-fast) var(--fx-ease);
+}
+
+.greedified-add {
+  border-color: var(--greed-color, #fff);
+  background: var(--greed-color, #fff);
+  color: #080808;
+}
+
+.greedified-url-form {
+  display: flex;
+  gap: 10px;
+}
+
+.greedified-url-input {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 42px;
+  flex: 1;
+  padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-round);
+  outline: none;
+  background: var(--surface-sunken);
+  color: var(--text);
+  font: inherit;
+}
+
+.greedified-url-input:focus-visible {
+  border-color: var(--greed-color, #fff);
+}
+
+.greedified-add-url {
+  min-width: 88px;
+}
+
+.greedified-add:hover,
+.greedified-add-url:hover,
+.greedified-download:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.greedified-add:hover {
+  background: color-mix(in srgb, var(--greed-color, #fff) 82%, #888);
+}
+
+.greedified-add-url:hover {
+  background: var(--surface-hover);
+}
+
+.greedified-content {
+  min-height: 200px;
+  flex: 1;
+}
+
+.greedified-library {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  box-shadow: var(--shadow-md);
+}
+
+.greedified-library__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 24px 16px;
+}
+
+.greedified-url-form {
+  gap: 7px;
+}
+
+.greedified-url-input {
+  padding: 0 12px;
+  font-size: var(--text-xs);
+}
+
+.greedified-add-url {
+  min-width: 72px;
+  padding: 0 12px;
+  font-size: var(--text-xs);
+}
+
+.greedified-library__title h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  letter-spacing: 0.05em;
+}
+
+.greedified-library__title span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.greedified-search {
+  box-sizing: border-box;
+  width: min(240px, 45%);
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-round);
+  outline: none;
+  background: var(--surface-sunken);
+  color: var(--text);
+  font: inherit;
+}
+
+.greedified-search:focus-visible {
+  border-color: var(--greed-color, #fff);
+}
+
+.greedified-playlist {
+  min-height: 180px;
+  max-height: min(45vh, 480px);
+  overflow: auto;
+  padding: 0 12px 12px;
+}
+
+.greedified-playlist[data-dragging] {
+  outline: 2px dashed var(--greed-color, #fff);
+  outline-offset: -5px;
+  background: rgb(255 255 255 / 5%);
+}
+
+.greedified-empty {
+  display: grid;
+  min-height: 160px;
+  margin: 0;
+  padding: 20px;
+  place-items: center;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.greedified-track {
+  display: grid;
+  grid-template-columns: 38px 38px minmax(0, 1fr) 40px 40px;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+}
+
+.greedified-track:hover,
+.greedified-track[data-current] {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.greedified-track[data-current] .greedified-track__title {
+  color: var(--greed-color, #fff);
+}
+
+.greedified-track__number {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.greedified-track__play,
+.greedified-track__action,
+.greedified-control,
+.greedified-toggle,
+.greedified-play {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.greedified-track__play:hover,
+.greedified-track__action:hover,
+.greedified-control:hover,
+.greedified-toggle:hover {
+  background: rgb(255 255 255 / 10%);
+  color: var(--text);
+}
+
+.greedified-track__metadata {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.greedified-track__title {
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.greedified-track__subtitle {
+  color: var(--text-faint);
+  font-size: var(--text-xs);
+}
+
+.greedified-track__action {
+  color: var(--text-muted);
+  font-size: 19px;
+}
+
+.greedified-track__action:last-child {
+  font-size: 22px;
+}
+
+.greedified-player {
+  display: grid;
+  grid-template-columns: 56px minmax(130px, 0.8fr) minmax(220px, 1.6fr) minmax(90px, 0.5fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin-top: auto;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(110deg, rgb(255 255 255 / 5%), transparent 40%),
+    var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+}
+
+.greedified-player__art {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.greedified-player__details {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.greedified-player__title {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.greedified-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.greedified-control,
+.greedified-toggle {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.greedified-toggle[aria-pressed="true"] {
+  color: var(--greed-color, #fff);
+}
+
+.greedified-play {
+  width: 42px;
+  height: 42px;
+  background: var(--greed-color, #fff);
+  color: #080808;
+  font-size: 18px;
+}
+
+.greedified-play:hover {
+  transform: scale(1.05);
+}
+
+.greedified-timeline {
+  display: grid;
+  grid-template-columns: 36px minmax(60px, 1fr) 36px;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.greedified-timeline input,
+.greedified-volume input {
+  width: 100%;
+  accent-color: var(--greed-color, #fff);
+}
+
+.greedified-volume {
+  display: grid;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.greedified-download:disabled {
+  opacity: 0.45;
+}
+
+.greedified-status {
+  min-height: 1.2em;
+  margin: -14px 0 0;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+@media (max-width: 900px) {
+  .greedified-player {
+    grid-template-columns: 48px minmax(100px, 1fr) auto auto;
+  }
+
+  .greedified-player__art {
+    width: 48px;
+    height: 48px;
+  }
+
+  .greedified-player__main {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .greedified-volume {
+    grid-column: 1 / 3;
+    grid-row: 3;
+    grid-template-columns: auto minmax(80px, 1fr);
+    align-items: center;
+  }
+
+  .greedified-player__download {
+    grid-column: 4;
+    grid-row: 3;
+  }
+}
+
+@media (max-width: 520px) {
+  .greedified {
+    gap: 16px;
+    padding: 18px 14px;
+  }
+
+  .greedified-logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .greedified-heading p {
+    max-width: 26ch;
+    font-size: var(--text-xs);
+  }
+
+  .greedified-add {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: var(--text-xs);
+  }
+
+  .greedified-library__header {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 18px 16px 12px;
+  }
+
+  .greedified-search {
+    width: 100%;
+  }
+
+  .greedified-track {
+    grid-template-columns: 24px 34px minmax(0, 1fr) 34px 34px;
+    gap: 6px;
+    padding: 0 5px;
+  }
+
+  .greedified-player {
+    grid-template-columns: 42px minmax(0, 1fr) auto auto;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .greedified-player__art {
+    width: 42px;
+    height: 42px;
+  }
+
+  .greedified-player__details {
+    grid-column: 2 / 4;
+  }
+
+  .greedified-controls {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .greedified-player__main {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  .greedified-volume {
+    grid-column: 1 / 3;
+    grid-row: 4;
+  }
+
+  .greedified-player__download {
+    grid-column: 4;
+    grid-row: 4;
+  }
+
+  .greedified-status {
+    margin-top: -6px;
+  }
+}
+
 @media (max-width: 860px) {
   .home {
     align-items: center;
@@ -408,6 +920,26 @@ a[href*="tiktok.com"],
   .bento {
     width: min(calc(100vw - 32px), calc(100vh - 32px));
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .greed-greed-list > li {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .greed-greed-item {
+    width: 100%;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .greed-greed-label {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: clamp(7px, 2.2vw, 10px);
+    white-space: nowrap;
   }
 }
 
