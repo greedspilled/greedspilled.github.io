@@ -453,7 +453,42 @@ function createDeveloperToolsPanel() {
   close.type = "button";
   close.setAttribute("aria-label", "Close Greed developer tools");
   close.textContent = "×";
-  header.append(title, close);
+
+  const actions = document.createElement("div");
+  actions.className = "greed-devtools__actions";
+  const copyDiagnostics = document.createElement("button");
+  copyDiagnostics.className = "greed-devtools__action";
+  copyDiagnostics.type = "button";
+  copyDiagnostics.textContent = "Copy diagnostics";
+  copyDiagnostics.addEventListener("click", async () => {
+    const status = panel.querySelector(".greed-devtools__status");
+    if (!status) return;
+
+    try {
+      await navigator.clipboard.writeText(
+        [
+          "Greed Unblocker diagnostics",
+          `Browser: ${navigator.userAgent}`,
+          `Viewport: ${window.innerWidth}x${window.innerHeight}`,
+          `Online: ${navigator.onLine ? "yes" : "no"}`,
+          `Route: ${location.hash || "#/browser"}`,
+        ].join("\n"),
+      );
+      status.textContent = "Diagnostics copied to clipboard.";
+    } catch (error) {
+      console.error("Could not copy Greed diagnostics.", error);
+      status.textContent = "Could not copy diagnostics. Check clipboard access.";
+    }
+  });
+
+  const reload = document.createElement("button");
+  reload.className = "greed-devtools__action";
+  reload.type = "button";
+  reload.textContent = "Reload app";
+  reload.addEventListener("click", () => window.location.reload());
+
+  actions.append(copyDiagnostics, reload, close);
+  header.append(title, actions);
 
   const status = document.createElement("p");
   status.className = "greed-devtools__status";
@@ -547,17 +582,24 @@ function setDeveloperToolsOpen(open) {
   const panel = document.querySelector("#greed-devtools-panel");
   if (!panel) return;
 
+  const wasFocusedInside = panel.contains(document.activeElement);
   panel.hidden = !open;
   document
     .querySelector("[data-wrath-devtools-toggle]")
     ?.setAttribute("aria-expanded", String(open));
-  if (!open) return;
+  if (!open) {
+    if (wasFocusedInside) {
+      document.querySelector("[data-wrath-devtools-toggle]")?.focus();
+    }
+    return;
+  }
 
   const status = panel.querySelector(".greed-devtools__status");
   const retry = panel.querySelector(".greed-devtools__retry");
   const host = panel.querySelector(".greed-devtools__eruda");
   if (!status || !retry || !host) return;
 
+  panel.querySelector(".greed-devtools__close")?.focus();
   void loadEruda(host, status, retry)
     .then((eruda) => {
       if (!panel.hidden) eruda.show();
@@ -991,6 +1033,12 @@ function applyRebrand() {
     }
   }
 
+  const searchInput = document.querySelector(".search-input");
+  if (searchInput) {
+    searchInput.setAttribute("aria-keyshortcuts", "/");
+    if (!searchInput.title) searchInput.title = "Press / to focus search";
+  }
+
   updateFooter();
   syncAppearancePanel();
   syncThemeBackground();
@@ -1000,6 +1048,46 @@ function applyRebrand() {
   syncPrimaryNavigation();
   syncDeveloperTools();
 }
+
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key !== "/" ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.isComposing ||
+    (event.target instanceof Element &&
+      event.target.closest(
+        'input, textarea, select, [contenteditable=""], [contenteditable="true"]',
+      ))
+  ) {
+    return;
+  }
+
+  const search = document.querySelector(".search-input");
+  if (
+    !(search instanceof HTMLInputElement) ||
+    search.disabled ||
+    search.getClientRects().length === 0
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  search.focus();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key !== "Escape" ||
+    !document.querySelector("#greed-devtools-panel:not([hidden])")
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  setDeveloperToolsOpen(false);
+});
 
 const observer = new MutationObserver((mutations) => {
   for (const mutation of mutations) {

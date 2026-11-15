@@ -373,8 +373,10 @@ a[href*="tiktok.com"],
 }
 
 .wordmark {
+  align-items: center;
   flex-direction: column;
   gap: 8px;
+  text-align: center;
 }
 
 .wordmark-mark {
@@ -383,6 +385,7 @@ a[href*="tiktok.com"],
 
 .wordmark::before {
   display: block;
+  order: 0;
   width: clamp(136px, 24vw, 208px);
   height: clamp(88px, 15.5vw, 132px);
   background-image: var(--greed-theme-logo);
@@ -394,9 +397,11 @@ a[href*="tiktok.com"],
 }
 
 .wordmark-text {
+  order: 1;
   font-size: clamp(40px, 8vw, 64px);
   letter-spacing: 0.14em;
   text-transform: none;
+  text-align: center;
 }
 
 @media (max-width: 767px) {
@@ -819,6 +824,12 @@ a[href*="tiktok.com"],
   gap: 16px;
 }
 
+.greed-devtools__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .greed-devtools__header h2 {
   margin: 0;
   font-size: 1.1rem;
@@ -826,7 +837,8 @@ a[href*="tiktok.com"],
 }
 
 .greed-devtools__close,
-.greed-devtools__retry {
+.greed-devtools__retry,
+.greed-devtools__action {
   min-height: 36px;
   border: 1px solid var(--border-strong);
   border-radius: 9px;
@@ -841,6 +853,10 @@ a[href*="tiktok.com"],
   width: 36px;
   padding: 0;
   font-size: 1.3rem;
+}
+
+.greed-devtools__action {
+  white-space: nowrap;
 }
 
 .greed-devtools__status {
@@ -889,7 +905,8 @@ a[href*="tiktok.com"],
 }
 
 .greed-devtools__close:focus-visible,
-.greed-devtools__retry:focus-visible {
+.greed-devtools__retry:focus-visible,
+.greed-devtools__action:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -910,6 +927,21 @@ a[href*="tiktok.com"],
     gap: 8px;
     border-radius: 12px;
     padding: 9px;
+  }
+
+  .greed-devtools__header {
+    align-items: flex-start;
+  }
+
+  .greed-devtools__actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .greed-devtools__action {
+    min-height: 32px;
+    padding: 0 8px;
+    font-size: 0.8rem;
   }
 }
 

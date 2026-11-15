@@ -17,7 +17,8 @@ and Honour uses `honour.png`; the looping video backgrounds
 `assets/icons/greed assets/`.
 
 The Debug button opens a Greed-themed Eruda developer console, loaded on demand
-from jsDelivr.
+from jsDelivr. The panel also offers one-click diagnostics copying and app
+reload; press Escape to close it. On the start page, press `/` to focus search.
 
 The Games tab loads its catalog from Selenite, a source used by
 [Lyra](https://github.com/selenesia/lyra), and plays selected games in an
