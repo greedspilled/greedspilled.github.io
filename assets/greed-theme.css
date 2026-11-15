@@ -63,20 +63,16 @@
   background-image: url("./icons/greed%20assets/browser.jpg");
 }
 
-.greed-greed-list > li:nth-child(3) > .greed-greed-item::before {
-  background-image: url("./icons/greed%20assets/G%40m3s.jpg");
-}
-
 .greed-greed-list > li:nth-child(4) > .greed-greed-item::before {
   background-image: url("./icons/greed%20assets/apps.jpg");
 }
 
-.greed-greed-list > li:nth-child(5) > .greed-greed-item::before {
-  background-image: url("./icons/greed%20assets/ai.jpg");
-}
-
 .greed-greed-list > li:nth-child(7) > .greed-greed-item::before {
   background-image: url("./icons/greed%20assets/settings.jpg");
+}
+
+.greed-greed-list > li[hidden] {
+  display: none !important;
 }
 
 .ax-address__icon-btn[aria-label="Go back"] svg,
@@ -134,7 +130,7 @@
 .ax-workspace__empty::before,
 .ax-frame:has(> .ax-frame__view[title="Browser tab"]:not([src]))::after {
   color: var(--greed-color, #fff);
-  content: "Grave";
+  content: "Greed";
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 7vw, 5rem);
   font-weight: 700;

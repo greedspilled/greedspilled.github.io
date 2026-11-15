@@ -1,16 +1,14 @@
 const footerMessages = [
   "Stay sharp..",
-  "Talk to people about your mental health",
+  "Take care of yourself.",
   "Be kind to yourself.",
-  "Anti Securly Squad (:",
-  "Lowk I think the AI is a little too smart for its own good.",
+  "Keep exploring.",
 ];
 
 const labelReplacements = new Map([
-  ["AI", "GREEDGPT"],
-  ["Browser", "Grave"],
-  ["G@mes", "gS5"],
+  ["Browser", "Greed"],
 ]);
+const allowedRoutes = new Set(["browser", "settings"]);
 
 let footerIndex = 0;
 let greedColor = "#ffffff";
@@ -173,40 +171,15 @@ function updateFooter() {
   }, 180);
 }
 
-function syncAiBranding() {
-  for (const heading of document.querySelectorAll(
-    ".ai-head-title h1, .ai-empty h2",
-  )) {
-    if (heading.textContent.trim().toLowerCase() === "greed ai") {
-      heading.textContent = "GREEDGPT";
-    }
-  }
+function enforceBrowserOnly() {
+  const route = location.hash.replace(/^#\/?/, "").split("/")[0];
+  if (!allowedRoutes.has(route)) location.hash = "#/browser";
 }
 
-function syncGamesBranding() {
-  for (const element of document.querySelectorAll(
-    ".home-arcade-tile-title, .home-arcade-tile-sub, .arcade-title, .arcade-count, .arcade-status-text",
-  )) {
-    const text = element.textContent.replace(/g@mes/gi, "gS5");
-    if (element.textContent !== text) element.textContent = text;
-  }
-
-  const catalog = document.querySelector(".arcade-catalog");
-  if (catalog?.getAttribute("aria-label") === "G@mes") {
-    catalog.setAttribute("aria-label", "gS5");
-  }
-
-  for (const element of document.querySelectorAll('[aria-label="G@mes results"]')) {
-    element.setAttribute("aria-label", "gS5 results");
-  }
-
-  for (const button of document.querySelectorAll(
-    '.play-surface-btn[aria-label^="Back to "]',
-  )) {
-    const label = button.getAttribute("aria-label");
-    if (label?.includes("G@mes")) {
-      button.setAttribute("aria-label", label.replace("G@mes", "gS5"));
-    }
+function syncPrimaryNavigation() {
+  for (const item of document.querySelectorAll(".greed-greed-list > li")) {
+    const label = item.querySelector(".greed-greed-label")?.textContent.trim();
+    item.hidden = label !== "Greed" && label !== "Settings";
   }
 }
 
@@ -303,23 +276,12 @@ function syncBrowserDirectOpen() {
   }
 }
 
-function hideChat() {
-  for (const label of document.querySelectorAll(".greed-greed-label")) {
-    if (label.textContent.trim() === "Chat" || label.textContent.trim() === "Griscord") {
-      label.closest("li")?.setAttribute("hidden", "");
-    }
-  }
-
-  if (location.hash.replace(/^#\/?/, "").split("/")[0] === "chat") {
-    location.hash = "#/home";
-  }
-}
-
 function applyRebrand() {
-  if (document.title !== "greedOS") document.title = "greedOS";
+  enforceBrowserOnly();
+  if (document.title !== "Greed") document.title = "Greed";
 
   for (const wordmark of document.querySelectorAll(".wordmark-text")) {
-    if (wordmark.textContent !== "greedOS") wordmark.textContent = "greedOS";
+    if (wordmark.textContent !== "Greed") wordmark.textContent = "Greed";
   }
 
   for (const label of document.querySelectorAll(".greed-greed-label")) {
@@ -343,11 +305,9 @@ function applyRebrand() {
 
   updateFooter();
   syncAppearancePanel();
-  syncAiBranding();
   syncBrowserAddressBar();
   syncBrowserDirectOpen();
-  syncGamesBranding();
-  hideChat();
+  syncPrimaryNavigation();
 }
 
 const observer = new MutationObserver(() => {
@@ -361,7 +321,7 @@ observer.observe(document.documentElement, {
 });
 
 applyRebrand();
-window.addEventListener("hashchange", hideChat);
+window.addEventListener("hashchange", enforceBrowserOnly);
 
 window.setInterval(() => {
   footerIndex = (footerIndex + 1) % footerMessages.length;
