@@ -8,14 +8,15 @@ const footerMessages = [
 
 const labelReplacements = new Map([
   ["AI", "GREEDGPT"],
-  ["Browser", "Greedle"],
-  ["Chat", "Griscord"],
+  ["Browser", "Grave"],
   ["G@mes", "gs5"],
 ]);
 
 let footerIndex = 0;
 let greedColor = "#ffffff";
 let colorStorageError = "";
+let adultFilterReadErrorReported = false;
+const addressInputs = new WeakSet();
 
 try {
   const savedColor = window.localStorage.getItem("greed-accent-color");
@@ -183,11 +184,138 @@ function syncAiBranding() {
   }
 }
 
+function displayAddress(input) {
+  if (document.activeElement === input) return;
+
+  if (input.dataset.grdlDisplay === "true") {
+    const displayedAddress = input.dataset.grdlAddress.replace(
+      /^https:\/\//i,
+      "grdl://",
+    );
+    if (input.value === displayedAddress) return;
+    input.dataset.grdlDisplay = "";
+  }
+
+  const address = input.value.trim();
+  if (!/^https:\/\//i.test(address)) return;
+
+  input.dataset.grdlAddress = address;
+  input.value = address.replace(/^https:\/\//i, "grdl://");
+  input.dataset.grdlDisplay = "true";
+}
+
+function syncBrowserAddressBar() {
+  for (const input of document.querySelectorAll(
+    ".ax-address__input[aria-label='Address and search']",
+  )) {
+    if (!addressInputs.has(input)) {
+      input.addEventListener("input", () => {
+        input.dataset.grdlDisplay = "";
+        input.dataset.grdlAddress = input.value;
+      });
+      input.addEventListener("focus", () => {
+        if (input.dataset.grdlDisplay !== "true") return;
+        input.value = input.dataset.grdlAddress;
+        input.dataset.grdlDisplay = "";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.setSelectionRange(0, input.value.length);
+      });
+      input.addEventListener("blur", () => displayAddress(input));
+      addressInputs.add(input);
+    }
+
+    displayAddress(input);
+  }
+}
+
+function openAddressDirectly() {
+  if (isAdultFilterEnabled()) return;
+
+  const input = document.querySelector(
+    ".ax-address__input[aria-label='Address and search']",
+  );
+  let address = input?.dataset.grdlAddress || input?.value.trim() || "";
+  if (/^grdl:\/\//i.test(address)) {
+    address = address.replace(/^grdl:/i, "https:");
+  }
+
+  try {
+    const url = new URL(address);
+    if (
+      (url.protocol === "https:" || url.protocol === "http:") &&
+      !url.username &&
+      !url.password
+    ) {
+      window.open(url.href, "_blank", "noopener,noreferrer");
+    }
+  } catch {
+    return;
+  }
+}
+
+function isAdultFilterEnabled() {
+  try {
+    const savedSettings = window.localStorage.getItem("greed_settings_v1");
+    const settings = savedSettings ? JSON.parse(savedSettings) : null;
+    return settings?.relay?.blockAdult !== false;
+  } catch (error) {
+    if (!adultFilterReadErrorReported) {
+      console.error("Could not read the adult-content filter setting.", error);
+      adultFilterReadErrorReported = true;
+    }
+    return true;
+  }
+}
+
+function syncBrowserDirectOpen() {
+  const errorActions = document.querySelector(".ax-error__actions");
+  const addressMenu = document.querySelector(".ax-address__menu");
+  const buttons = document.querySelectorAll("[data-greed-direct-open]");
+
+  if (isAdultFilterEnabled()) {
+    for (const button of buttons) button.remove();
+    return;
+  }
+
+  if (errorActions && !errorActions.querySelector("[data-greed-direct-open]")) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "ax-error__btn";
+    button.dataset.greedDirectOpen = "true";
+    button.textContent = "Open site in a new tab";
+    button.addEventListener("click", openAddressDirectly);
+    errorActions.append(button);
+  }
+
+  if (addressMenu && !addressMenu.querySelector("[data-greed-direct-open]")) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "ax-address__menu-item";
+    button.dataset.greedDirectOpen = "true";
+    button.setAttribute("role", "menuitem");
+    button.textContent = "Open current site directly";
+    button.addEventListener("click", openAddressDirectly);
+    addressMenu.append(button);
+  }
+}
+
+function hideChat() {
+  for (const label of document.querySelectorAll(".greed-greed-label")) {
+    if (label.textContent.trim() === "Chat" || label.textContent.trim() === "Griscord") {
+      label.closest("li")?.setAttribute("hidden", "");
+    }
+  }
+
+  if (location.hash.replace(/^#\/?/, "").split("/")[0] === "chat") {
+    location.hash = "#/home";
+  }
+}
+
 function applyRebrand() {
-  if (document.title !== "Greed") document.title = "Greed";
+  if (document.title !== "greedOS") document.title = "greedOS";
 
   for (const wordmark of document.querySelectorAll(".wordmark-text")) {
-    if (wordmark.textContent !== "Greed") wordmark.textContent = "Greed";
+    if (wordmark.textContent !== "greedOS") wordmark.textContent = "greedOS";
   }
 
   for (const label of document.querySelectorAll(".greed-greed-label")) {
@@ -212,6 +340,9 @@ function applyRebrand() {
   updateFooter();
   syncAppearancePanel();
   syncAiBranding();
+  syncBrowserAddressBar();
+  syncBrowserDirectOpen();
+  hideChat();
 }
 
 const observer = new MutationObserver(() => {
@@ -225,9 +356,12 @@ observer.observe(document.documentElement, {
 });
 
 applyRebrand();
+window.addEventListener("hashchange", hideChat);
 
 window.setInterval(() => {
   footerIndex = (footerIndex + 1) % footerMessages.length;
   updateFooter();
   applyRebrand();
 }, 5000);
+
+window.setInterval(syncBrowserAddressBar, 300);
