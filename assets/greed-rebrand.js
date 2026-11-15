@@ -6,7 +6,7 @@ const footerMessages = [
 ];
 
 const labelReplacements = new Map([
-  ["Browser", "Greed"],
+  ["Browser", "Wrath"],
 ]);
 const allowedRoutes = new Set(["browser", "settings"]);
 
@@ -19,7 +19,7 @@ try {
   const savedColor = window.localStorage.getItem("greed-accent-color");
   if (/^#[0-9a-f]{6}$/i.test(savedColor ?? "")) greedColor = savedColor;
 } catch (error) {
-  console.error("Could not read the saved Greed accent color.", error);
+  console.error("Could not read the saved Wrath accent color.", error);
   colorStorageError = "Color changes may not be saved in this browser.";
 }
 
@@ -43,7 +43,7 @@ function applyColor(red, green, blue, preview, output) {
     window.localStorage.setItem("greed-accent-color", greedColor);
     colorStorageError = "";
   } catch (error) {
-    console.error("Could not save the Greed accent color.", error);
+    console.error("Could not save the Wrath accent color.", error);
     colorStorageError = "Color changes apply now but could not be saved.";
   }
 }
@@ -51,7 +51,7 @@ function applyColor(red, green, blue, preview, output) {
 function createColorPanel() {
   const panel = document.createElement("section");
   panel.className = "greed-color-panel";
-  panel.setAttribute("aria-label", "Greed RGB color");
+  panel.setAttribute("aria-label", "Wrath Unblocker accent color");
 
   const heading = document.createElement("div");
   const title = document.createElement("h3");
@@ -60,7 +60,7 @@ function createColorPanel() {
   const description = document.createElement("p");
   description.className = "greed-color-panel__description";
   description.textContent =
-    "Set the color used for Greed's white text and highlights.";
+    "Set the color used for Wrath Unblocker's highlights.";
   heading.append(title, description);
   panel.append(heading);
 
@@ -136,14 +136,14 @@ function syncAppearancePanel() {
   }
 
   content.setAttribute("data-greed-appearance", "");
-  if (summary && summary.textContent !== "Choose an RGB color for Greed's white highlights.") {
-    summary.textContent = "Choose an RGB color for Greed's white highlights.";
+  if (summary && summary.textContent !== "Choose an RGB color for Wrath Unblocker's highlights.") {
+    summary.textContent = "Choose an RGB color for Wrath Unblocker's highlights.";
   }
   for (const name of document.querySelectorAll(".settings-nav__item-name")) {
     if (name.textContent.trim() === "Appearance") {
       const description = name.nextElementSibling;
-      if (description && description.textContent !== "RGB accent color") {
-        description.textContent = "RGB accent color";
+      if (description && description.textContent !== "Wrath Unblocker accent color") {
+        description.textContent = "Wrath Unblocker accent color";
       }
     }
   }
@@ -179,8 +179,126 @@ function enforceBrowserOnly() {
 function syncPrimaryNavigation() {
   for (const item of document.querySelectorAll(".greed-greed-list > li")) {
     const label = item.querySelector(".greed-greed-label")?.textContent.trim();
-    item.hidden = label !== "Greed" && label !== "Settings";
+    item.hidden = label !== "Wrath" && label !== "Settings";
   }
+}
+
+function updateDeveloperTools(panel) {
+  const activeTab = document.querySelector('.ax-tab[aria-selected="true"]');
+  const addressInput = document.querySelector(
+    ".ax-address__input[aria-label='Address and search']",
+  );
+  const activeFrame = document.querySelector(
+    ".ax-frame--active .ax-frame__view",
+  );
+  const frameStatus = document.querySelector(
+    ".ax-frame--active .ax-frame__phase",
+  );
+  const values = {
+    title:
+      activeTab?.querySelector(".ax-tab__label")?.textContent.trim() ||
+      activeTab?.getAttribute("title") ||
+      "New tab",
+    address:
+      addressInput?.dataset.grdlAddress ||
+      addressInput?.value.trim() ||
+      "about:blank",
+    status:
+      frameStatus?.textContent.trim() ||
+      (activeFrame?.getAttribute("src") ? "Frame active" : "Idle"),
+  };
+
+  for (const [key, value] of Object.entries(values)) {
+    const output = panel.querySelector(`[data-wrath-value="${key}"]`);
+    if (output && output.textContent !== value) output.textContent = value;
+  }
+}
+
+function setDeveloperToolsOpen(open) {
+  const panel = document.querySelector("#wrath-devtools-panel");
+  if (!panel) return;
+
+  panel.hidden = !open;
+  document
+    .querySelector("[data-wrath-devtools-toggle]")
+    ?.setAttribute("aria-expanded", String(open));
+  if (open) updateDeveloperTools(panel);
+}
+
+function createDeveloperToolsPanel() {
+  const panel = document.createElement("section");
+  panel.id = "wrath-devtools-panel";
+  panel.className = "wrath-devtools";
+  panel.hidden = true;
+  panel.setAttribute("role", "region");
+  panel.setAttribute("aria-label", "Developer tools");
+
+  const header = document.createElement("header");
+  header.className = "wrath-devtools__header";
+  const title = document.createElement("h2");
+  title.textContent = "Developer tools";
+  const close = document.createElement("button");
+  close.className = "wrath-devtools__close";
+  close.type = "button";
+  close.setAttribute("aria-label", "Close developer tools");
+  close.textContent = "×";
+  close.addEventListener("click", () => setDeveloperToolsOpen(false));
+  header.append(title, close);
+
+  const details = document.createElement("dl");
+  details.className = "wrath-devtools__details";
+  for (const [key, label] of [
+    ["title", "Active tab"],
+    ["address", "Address"],
+    ["status", "Frame status"],
+  ]) {
+    const row = document.createElement("div");
+    row.className = "wrath-devtools__row";
+    const term = document.createElement("dt");
+    term.textContent = label;
+    const value = document.createElement("dd");
+    value.dataset.wrathValue = key;
+    row.append(term, value);
+    details.append(row);
+  }
+
+  const note = document.createElement("p");
+  note.className = "wrath-devtools__note";
+  note.textContent =
+    "Web pages run in isolated frames. This panel shows browser-visible tab information only.";
+  panel.append(header, details, note);
+  return panel;
+}
+
+function syncDeveloperTools() {
+  const menu = document.querySelector(".ax-address__menu-wrap");
+  if (!menu) return;
+
+  let panel = document.querySelector("#wrath-devtools-panel");
+  if (!panel) {
+    panel = createDeveloperToolsPanel();
+    document.body.append(panel);
+  }
+
+  let toggle = menu.querySelector("[data-wrath-devtools-toggle]");
+  if (!toggle) {
+    toggle = document.createElement("button");
+    toggle.className = "ax-address__icon-btn wrath-devtools__toggle";
+    toggle.type = "button";
+    toggle.dataset.wrathDevtoolsToggle = "true";
+    toggle.setAttribute("aria-label", "Developer tools");
+    toggle.setAttribute("aria-controls", panel.id);
+    toggle.setAttribute("aria-expanded", String(!panel.hidden));
+    toggle.title = "Developer tools";
+    toggle.textContent = "";
+    toggle.addEventListener("click", () =>
+      setDeveloperToolsOpen(panel.hidden),
+    );
+    const moreActions = menu.querySelector('[aria-label="More actions"]');
+    menu.insertBefore(toggle, moreActions ?? null);
+  }
+
+  if (!panel.hidden) updateDeveloperTools(panel);
 }
 
 function displayAddress(input) {
@@ -278,10 +396,14 @@ function syncBrowserDirectOpen() {
 
 function applyRebrand() {
   enforceBrowserOnly();
-  if (document.title !== "Greed") document.title = "Greed";
+  if (document.title !== "Wrath Unblocker") {
+    document.title = "Wrath Unblocker";
+  }
 
   for (const wordmark of document.querySelectorAll(".wordmark-text")) {
-    if (wordmark.textContent !== "Greed") wordmark.textContent = "Greed";
+    if (wordmark.textContent !== "Wrath Unblocker") {
+      wordmark.textContent = "Wrath Unblocker";
+    }
   }
 
   for (const label of document.querySelectorAll(".greed-greed-label")) {
@@ -308,6 +430,7 @@ function applyRebrand() {
   syncBrowserAddressBar();
   syncBrowserDirectOpen();
   syncPrimaryNavigation();
+  syncDeveloperTools();
 }
 
 const observer = new MutationObserver(() => {
