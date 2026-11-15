@@ -35,7 +35,7 @@
   width: 60px;
   height: 60px;
   background: center / contain no-repeat
-    url("./icons/wrath-logo.png");
+    url("./icons/greed%20assets/logo.png");
 }
 
 .greed-greed-brand svg,
@@ -73,6 +73,18 @@
 
 .greed-greed-list > li[hidden] {
   display: none !important;
+}
+
+.greed-greed-list::after {
+  display: block;
+  align-self: center;
+  width: 48px;
+  height: 84px;
+  margin-top: var(--space-2);
+  background: center / auto 100% no-repeat
+    url("./icons/greed%20assets/border.png");
+  content: "";
+  opacity: 0.9;
 }
 
 .ax-address__menu-wrap {
@@ -254,7 +266,7 @@ a[href*="tiktok.com"],
   width: clamp(136px, 24vw, 208px);
   height: clamp(88px, 15.5vw, 132px);
   background: center / contain no-repeat
-    url("./icons/wrath-logo.png");
+    url("./icons/greed%20assets/logo.png");
   content: "";
   filter: drop-shadow(0 4px 18px rgb(255 255 255 / 30%));
 }
