@@ -4,10 +4,6 @@ Games and CSS from https://github.com/greedspilled/arctic-static; the rest is mi
 
 The navigation labels are gs5 (Games), Grave (Browser), and GREEDGPT (AI).
 
-The Grave browser's adult-content filter is off by default and remains available
-in Settings.
-
-If a site cannot load through the Grave browser relay, the browser error screen
-offers an option to open its address directly in a new tab.
-
+Grave's ad and adult-content filters are off by default. Sites that fail through
+the relay can be opened directly in a new tab.
 

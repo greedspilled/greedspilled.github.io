@@ -2,7 +2,7 @@ if (location.hash.replace(/^#\/?/, "").split("/")[0] === "chat") {
   location.hash = "#/home";
 }
 
-const migrationKey = "greed_adult_filter_default_disabled_v1";
+const migrationKey = "greed_browser_content_filters_disabled_v1";
 const settingsKey = "greed_settings_v1";
 
 try {
@@ -21,6 +21,7 @@ try {
         ? settings.relay
         : {};
     settings.relay.blockAdult = false;
+    settings.relay.blockAds = false;
     localStorage.setItem(settingsKey, JSON.stringify(settings));
     localStorage.setItem(migrationKey, "1");
   }

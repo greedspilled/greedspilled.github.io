@@ -15,7 +15,6 @@ const labelReplacements = new Map([
 let footerIndex = 0;
 let greedColor = "#ffffff";
 let colorStorageError = "";
-let adultFilterReadErrorReported = false;
 const addressInputs = new WeakSet();
 
 try {
@@ -229,8 +228,6 @@ function syncBrowserAddressBar() {
 }
 
 function openAddressDirectly() {
-  if (isAdultFilterEnabled()) return;
-
   const input = document.querySelector(
     ".ax-address__input[aria-label='Address and search']",
   );
@@ -253,29 +250,9 @@ function openAddressDirectly() {
   }
 }
 
-function isAdultFilterEnabled() {
-  try {
-    const savedSettings = window.localStorage.getItem("greed_settings_v1");
-    const settings = savedSettings ? JSON.parse(savedSettings) : null;
-    return settings?.relay?.blockAdult !== false;
-  } catch (error) {
-    if (!adultFilterReadErrorReported) {
-      console.error("Could not read the adult-content filter setting.", error);
-      adultFilterReadErrorReported = true;
-    }
-    return true;
-  }
-}
-
 function syncBrowserDirectOpen() {
   const errorActions = document.querySelector(".ax-error__actions");
   const addressMenu = document.querySelector(".ax-address__menu");
-  const buttons = document.querySelectorAll("[data-greed-direct-open]");
-
-  if (isAdultFilterEnabled()) {
-    for (const button of buttons) button.remove();
-    return;
-  }
 
   if (errorActions && !errorActions.querySelector("[data-greed-direct-open]")) {
     const button = document.createElement("button");
