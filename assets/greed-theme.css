@@ -35,7 +35,7 @@
   width: 60px;
   height: 60px;
   background: center / contain no-repeat
-    url("./icons/wrath-mark.svg");
+    url("./icons/wrath-logo.png");
 }
 
 .greed-greed-brand svg,
@@ -254,7 +254,7 @@ a[href*="tiktok.com"],
   width: clamp(136px, 24vw, 208px);
   height: clamp(88px, 15.5vw, 132px);
   background: center / contain no-repeat
-    url("./icons/wrath-mark.svg");
+    url("./icons/wrath-logo.png");
   content: "";
   filter: drop-shadow(0 4px 18px rgb(255 255 255 / 30%));
 }
