@@ -1,24 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300..700&family=Space+Grotesk:wght@300..700&display=swap");
+
 :root[data-palette] {
   --greed-color: #fff;
+  --greed-theme-logo: url("./icons/greed%20assets/logo.png");
+  --greed-theme-background: url("./icons/greed%20assets/bacground.gif");
   --font-sans: "Geo", "Iceland", system-ui, sans-serif;
   --font-display: "Geo", "Iceland", system-ui, sans-serif;
-  --bg-base: #050813;
-  --bg-deep: #02040b;
-  --bg-veil: rgb(5 8 19 / 78%);
-  --surface: #0c1220;
-  --surface-raised: #141d2e;
-  --surface-sunken: #060a13;
-  --surface-hover: #1c2940;
-  --border: #26344b;
-  --border-strong: #536982;
+  --bg-base: #050505;
+  --bg-deep: #000;
+  --bg-veil: rgb(0 0 0 / 78%);
+  --surface: #101010;
+  --surface-raised: #191919;
+  --surface-sunken: #080808;
+  --surface-hover: #242424;
+  --border: #303030;
+  --border-strong: #777;
   --text: var(--greed-color, #fff) !important;
   --text-muted: #c4c4c4;
   --text-faint: #888;
+  --greed-theme-accent: #fff;
   --accent-h: 0;
   --accent-s: 0%;
   --accent-l: 100%;
-  --accent: var(--greed-color, #fff) !important;
-  --accent-soft: color-mix(in srgb, var(--greed-color, #fff) 20%, #303030) !important;
+  --accent: color-mix(in srgb, var(--greed-color, #fff) 20%, var(--greed-theme-accent) 80%) !important;
+  --accent-soft: color-mix(in srgb, var(--greed-theme-accent) 22%, #303030) !important;
   --accent-text: #050505 !important;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 35%);
   --shadow-md: 0 4px 14px rgb(0 0 0 / 45%);
@@ -31,11 +36,70 @@
   color-scheme: dark;
 }
 
+:root[data-palette][data-greed-theme="singularity"] {
+  --greed-theme-logo: url("./icons/greed%20assets/slogo.png");
+  --greed-theme-background: none;
+  --font-sans: "Space Grotesk", system-ui, sans-serif;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --greed-theme-accent: #8bdcff;
+  --bg-base: #06101a;
+  --bg-deep: #02080d;
+  --surface: #0c1924;
+  --surface-raised: #142635;
+  --surface-sunken: #050d14;
+  --surface-hover: #1a3447;
+  --border: #24455a;
+  --border-strong: #5783a1;
+  --text-muted: #c1e0f0;
+}
+
+:root[data-palette][data-greed-theme="wrath"] {
+  --greed-theme-logo: url("./icons/greed%20assets/wlogo.png");
+  --greed-theme-background: none;
+  --font-sans: "Ghastly Panic", fantasy;
+  --font-display: "Ghastly Panic", fantasy;
+  --greed-theme-accent: #ff4654;
+  --bg-base: #100707;
+  --bg-deep: #080303;
+  --surface: #1b0d0e;
+  --surface-raised: #2a1214;
+  --surface-sunken: #0c0506;
+  --surface-hover: #391719;
+  --border: #512226;
+  --border-strong: #9a454d;
+  --text-muted: #d3b9bb;
+}
+
+:root[data-palette][data-greed-theme="honour"] {
+  --greed-theme-logo: url("./icons/greed%20assets/honour.png");
+  --greed-theme-background: none;
+  --font-sans: "Roboto Condensed", sans-serif;
+  --font-display: "Roboto Condensed", sans-serif;
+  --greed-theme-accent: #806b50;
+  --bg-base: #b7a688;
+  --bg-deep: #88765d;
+  --bg-veil: rgb(67 54 39 / 75%);
+  --surface: #d2c2a8;
+  --surface-raised: #ded0b8;
+  --surface-sunken: #c2b090;
+  --surface-hover: #cbbc9f;
+  --border: #a18b6e;
+  --border-strong: #806a50;
+  --text: #352b20 !important;
+  --text-muted: #5d4e3b;
+  --text-faint: #74634c;
+  --accent-text: #fff !important;
+  --danger: #7c483f;
+  color-scheme: light;
+}
+
 .greed-greed-brand {
   width: 60px;
   height: 60px;
-  background: center / contain no-repeat
-    url("./icons/greed%20assets/logo.png");
+  background-image: var(--greed-theme-logo);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .greed-greed-brand svg,
@@ -139,10 +203,21 @@
 }
 
 .ax-workspace__empty {
-  background:
+  background-color: var(--bg-base);
+  background-image:
     linear-gradient(rgb(0 0 0 / 48%), rgb(0 0 0 / 58%)),
-    url("./icons/greed%20assets/bacground.gif") center / cover no-repeat;
+    var(--greed-theme-background),
+    url("./icons/greed%20assets/bacground.gif");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   color: var(--greed-color, #fff);
+}
+
+:root[data-palette][data-greed-theme="honour"] .ax-workspace__empty {
+  background-color: var(--bg-base);
+  background-image: radial-gradient(circle at 50% 30%, #dbcdb5, #a99474);
+  color: var(--text);
 }
 
 .ax-workspace__empty::before,
@@ -155,6 +230,11 @@
   letter-spacing: 0.06em;
   line-height: 1;
   text-shadow: 0 4px 28px rgb(0 0 0 / 75%);
+}
+
+:root[data-palette][data-greed-theme="honour"] .ax-workspace__empty::before {
+  color: var(--text);
+  text-shadow: 0 2px 8px rgb(57 44 29 / 24%);
 }
 
 .ax-workspace__empty p {
@@ -172,10 +252,34 @@
   z-index: 1;
   display: grid;
   place-items: center;
-  background:
+  background-color: var(--bg-base);
+  background-image:
     linear-gradient(rgb(0 0 0 / 48%), rgb(0 0 0 / 58%)),
-    url("./icons/greed%20assets/bacground.gif") center / cover no-repeat;
+    var(--greed-theme-background),
+    url("./icons/greed%20assets/bacground.gif");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   pointer-events: none;
+}
+
+:root[data-palette][data-greed-theme]
+  .ax-frame:has(> .ax-frame__view[title="Browser tab"]:not([src])) {
+  isolation: isolate;
+}
+
+:root[data-palette][data-greed-theme]
+  .ax-frame:has(> .ax-frame__view[title="Browser tab"]:not([src]))::after {
+  background-color: transparent;
+  background-image: none;
+}
+
+:root[data-palette][data-greed-theme="honour"]
+  .ax-frame:has(> .ax-frame__view[title="Browser tab"]:not([src]))::after {
+  color: var(--text);
+  background-color: transparent;
+  background-image: linear-gradient(rgb(67 54 39 / 20%), rgb(67 54 39 / 30%));
+  text-shadow: 0 2px 8px rgb(57 44 29 / 24%);
 }
 
 .chat-surface {
@@ -224,6 +328,8 @@ a[href*="tiktok.com"],
 
 .bento-omni {
   box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
   width: 100%;
   height: 100%;
   justify-content: center;
@@ -232,10 +338,24 @@ a[href*="tiktok.com"],
   border-color: rgb(255 255 255 / 28%);
   border-radius: 24px;
   padding: clamp(22px, 6vw, 52px);
-  background:
+  background-color: var(--bg-base);
+  background-image:
     linear-gradient(rgb(0 0 0 / 58%), rgb(0 0 0 / 64%)),
-    url("./icons/greed%20assets/bacground.gif") center / cover no-repeat;
+    var(--greed-theme-background),
+    url("./icons/greed%20assets/bacground.gif");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   box-shadow: 0 24px 80px rgb(0 0 0 / 58%);
+}
+
+:root[data-palette][data-greed-theme] .bento-omni {
+  background-image: none;
+}
+
+:root[data-palette][data-greed-theme="honour"] .bento-omni {
+  background-image: none;
+  box-shadow: 0 24px 80px rgb(57 44 29 / 30%);
 }
 
 .omni-main {
@@ -265,8 +385,10 @@ a[href*="tiktok.com"],
   display: block;
   width: clamp(136px, 24vw, 208px);
   height: clamp(88px, 15.5vw, 132px);
-  background: center / contain no-repeat
-    url("./icons/greed%20assets/logo.png");
+  background-image: var(--greed-theme-logo);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
   content: "";
   filter: drop-shadow(0 4px 18px rgb(255 255 255 / 30%));
 }
@@ -306,6 +428,10 @@ a[href*="tiktok.com"],
   text-transform: uppercase;
 }
 
+:root[data-palette][data-greed-theme="honour"] .omni-clock::after {
+  color: var(--text-muted);
+}
+
 .search {
   width: min(100%, 520px);
 }
@@ -318,12 +444,25 @@ a[href*="tiktok.com"],
   backdrop-filter: blur(16px);
 }
 
+:root[data-palette][data-greed-theme="honour"] .search-field {
+  border-color: var(--border-strong);
+  background: rgb(244 234 216 / 90%);
+}
+
 .search-input {
   color: var(--greed-color, #fff);
 }
 
+:root[data-palette][data-greed-theme="honour"] .search-input {
+  color: var(--text);
+}
+
 .search-input::placeholder {
   color: color-mix(in srgb, var(--greed-color, #fff) 68%, transparent);
+}
+
+:root[data-palette][data-greed-theme="honour"] .search-input::placeholder {
+  color: var(--text-muted);
 }
 
 .search-hint {
@@ -341,13 +480,151 @@ a[href*="tiktok.com"],
   transition: opacity 180ms ease;
 }
 
+:root[data-palette][data-greed-theme="honour"] .omni-motd {
+  color: var(--text-muted);
+}
+
 .omni-motd.is-changing {
   opacity: 0;
 }
 
 .settings-content__inner[data-greed-appearance]
-  > :not(.settings-panel-head):not(.greed-color-panel) {
+  > :not(.settings-panel-head):not(.greed-theme-panel):not(.greed-color-panel) {
   display: none !important;
+}
+
+.greed-theme-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: var(--space-5);
+  padding: clamp(20px, 5vw, 36px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 100% 0, rgb(255 255 255 / 6%), transparent 48%),
+    var(--surface);
+}
+
+.greed-theme-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.greed-theme-option {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  background: var(--surface-sunken);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition:
+    border-color var(--fx-fast) var(--fx-ease),
+    background var(--fx-fast) var(--fx-ease);
+}
+
+.greed-theme-option[aria-pressed="true"] {
+  border-color: var(--greed-color, #fff);
+  background: var(--surface-raised);
+  box-shadow: 0 0 0 1px var(--greed-color, #fff);
+}
+
+.greed-theme-option:hover,
+.greed-theme-option:focus-visible {
+  border-color: var(--border-strong);
+}
+
+.greed-theme-option:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.greed-theme-option__preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 92px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.greed-theme-option__background,
+.greed-theme-option__logo {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.greed-theme-option__background {
+  background-image:
+    linear-gradient(rgb(0 0 0 / 42%), rgb(0 0 0 / 42%)),
+    var(--greed-theme-option-background, none),
+    url("./icons/greed%20assets/bacground.gif");
+  background-position: center;
+  background-size: cover;
+}
+
+:root[data-palette][data-greed-theme="honour"]
+  .greed-theme-option[data-greed-theme-choice="honour"]
+  .greed-theme-option__background {
+  background-image: linear-gradient(145deg, #e1d3bb, #ab9473);
+}
+
+.greed-theme-option__background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.greed-theme-option__logo {
+  inset: 12px;
+  background-image: var(--greed-theme-option-logo);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: drop-shadow(0 2px 8px rgb(0 0 0 / 65%));
+}
+
+.greed-theme-option__name {
+  font-weight: 700;
+}
+
+.greed-theme-option__description {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.greed-theme-video {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+:root[data-palette][data-greed-theme="honour"] .greed-theme-video,
+:root[data-palette][data-greed-theme="honour"]
+  .greed-theme-option[data-greed-theme-choice="honour"]
+  .greed-theme-option__background video {
+  filter: sepia(0.35) saturate(0.82) brightness(1.05);
+}
+
+.ax-workspace__empty {
+  position: relative;
+  isolation: isolate;
+}
+
+:root[data-palette][data-greed-theme] .ax-workspace__empty {
+  background-image: none;
 }
 
 .greed-color-panel {
@@ -463,6 +740,20 @@ a[href*="tiktok.com"],
 }
 
 @media (max-width: 767px) {
+  .greed-theme-options {
+    grid-template-columns: 1fr;
+  }
+
+  .greed-theme-option {
+    grid-template-columns: minmax(88px, 0.6fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 12px;
+  }
+
+  .greed-theme-option__preview {
+    grid-row: span 2;
+  }
+
   .greed-greed-list > li {
     min-width: 0;
     flex: 1;
@@ -497,87 +788,113 @@ a[href*="tiktok.com"],
   }
 }
 
-.wrath-devtools {
+.greed-devtools {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
+  inset: 12px;
   z-index: 10000;
-  width: min(440px, calc(100vw - 32px));
-  max-height: min(560px, calc(100vh - 40px));
-  overflow: auto;
-  border: 1px solid #536982;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
   border-radius: 16px;
-  padding: 18px;
+  padding: clamp(10px, 2vw, 18px);
   background:
-    radial-gradient(circle at 100% 0, rgb(123 223 242 / 14%), transparent 48%),
-    #080d19;
-  box-shadow: 0 18px 56px rgb(0 0 0 / 65%);
-  color: #e8f1ff;
+    radial-gradient(circle at 100% 0, rgb(255 255 255 / 8%), transparent 48%),
+    var(--bg-deep);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
   font-family: var(--font-sans);
 }
 
-.wrath-devtools[hidden] {
+.greed-devtools[hidden] {
   display: none;
 }
 
-.wrath-devtools__header {
+.greed-devtools__header {
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 14px;
 }
 
-.wrath-devtools__header h2 {
+.greed-devtools__header h2 {
   margin: 0;
   font-size: 1.1rem;
   letter-spacing: 0.06em;
 }
 
-.wrath-devtools__close {
-  width: 36px;
-  height: 36px;
-  border: 1px solid #536982;
+.greed-devtools__close,
+.greed-devtools__retry {
+  min-height: 36px;
+  border: 1px solid var(--border-strong);
   border-radius: 9px;
-  background: #101a2b;
+  padding: 0 12px;
+  background: var(--surface);
   color: inherit;
   cursor: pointer;
   font: inherit;
+}
+
+.greed-devtools__close {
+  width: 36px;
+  padding: 0;
   font-size: 1.3rem;
 }
 
-.wrath-devtools__details {
-  display: grid;
-  gap: 9px;
+.greed-devtools__status {
+  flex: none;
   margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
 }
 
-.wrath-devtools__row {
-  display: grid;
-  grid-template-columns: 105px minmax(0, 1fr);
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid rgb(83 105 130 / 45%);
+.greed-devtools__status:empty,
+.greed-devtools__retry[hidden] {
+  display: none;
 }
 
-.wrath-devtools__row dt {
-  color: #9db1c9;
+.greed-devtools__eruda {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
 }
 
-.wrath-devtools__row dd {
-  min-width: 0;
-  margin: 0;
-  overflow-wrap: anywhere;
+#eruda .eruda-container.eruda-inline {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
 }
 
-.wrath-devtools__note {
-  margin: 14px 0 0;
-  color: #a9bad0;
-  font-size: 0.85rem;
-  line-height: 1.5;
+#eruda .eruda-dev-tools {
+  border: 0 !important;
+  padding-top: 40px !important;
 }
 
-.wrath-devtools__toggle {
+#eruda .eruda-tab {
+  border-bottom: 1px solid var(--border) !important;
+}
+
+#eruda .eruda-tab .eruda-tab-item-active {
+  color: var(--greed-color, #fff) !important;
+}
+
+#eruda .eruda-entry-btn {
+  display: none !important;
+}
+
+.greed-devtools__close:focus-visible,
+.greed-devtools__retry:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.greed-devtools__toggle {
   width: 38px;
   background-image: url("./icons/greed%20assets/dev-tools.png");
   background-position: center;
@@ -585,6 +902,15 @@ a[href*="tiktok.com"],
   background-size: 22px;
   font-size: 0;
   mix-blend-mode: screen;
+}
+
+@media (max-width: 600px) {
+  .greed-devtools {
+    inset: 6px;
+    gap: 8px;
+    border-radius: 12px;
+    padding: 9px;
+  }
 }
 
 .wrath-context-menu {
@@ -773,40 +1099,6 @@ a[href*="tiktok.com"],
 .greed-games-card__name {
   overflow-wrap: anywhere;
   font-weight: 600;
-}
-
-.greed-games-player {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.greed-games-player__header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.greed-games-player__title {
-  min-width: 0;
-  flex: 1;
-  margin: 0;
-  overflow: hidden;
-  font-size: clamp(18px, 3vw, 26px);
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.greed-games-player__frame {
-  width: 100%;
-  min-height: 0;
-  flex: 1;
-  border: 0;
-  border-radius: var(--radius-lg);
-  background: #000;
 }
 
 .greed-games-panel__credit {

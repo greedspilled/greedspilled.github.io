@@ -10,24 +10,143 @@ const labelReplacements = new Map([
   ["G@mes", "Games"],
 ]);
 const allowedRoutes = new Set(["browser", "settings"]);
+const erudaScriptUrl = "https://cdn.jsdelivr.net/npm/eruda@3.4.3/eruda.js";
+const erudaScriptIntegrity =
+  "sha384-weDBY9jeIj4NqaiZF9f6PMAMMY4lIu+0CAI+TjBIE73RctCQOxDoEHltYnstRszI";
+const greedThemes = [
+  {
+    id: "greed",
+    name: "Default (Greed)",
+    description: "Greed's original black and white look.",
+    logo: "logo.png",
+    background: "bacground.gif",
+  },
+  {
+    id: "singularity",
+    name: "Singularity",
+    description: "A cool light-blue theme.",
+    logo: "slogo.png",
+    background: "singulairty.mp4",
+  },
+  {
+    id: "wrath",
+    name: "Wrath",
+    description: "A bold red theme.",
+    logo: "wlogo.png",
+    background: "wrath.MP4",
+  },
+  {
+    id: "honour",
+    name: "Honour",
+    description: "A muted, melancholic sepia theme.",
+    logo: "honour.png",
+    background: "honour.mp4",
+  },
+];
 const contextMenuFrames = new WeakSet();
 const contextMenuDocuments = new WeakSet();
 
 let footerIndex = 0;
 let greedColor = "#ffffff";
+let greedTheme = "greed";
 let colorStorageError = "";
+let themeStorageError = "";
 let contextMenu;
+let erudaLoadPromise;
 const addressInputs = new WeakSet();
 
 try {
   const savedColor = window.localStorage.getItem("greed-accent-color");
   if (/^#[0-9a-f]{6}$/i.test(savedColor ?? "")) greedColor = savedColor;
+  const savedTheme = window.localStorage.getItem("greed-theme");
+  if (greedThemes.some((theme) => theme.id === savedTheme)) {
+    greedTheme = savedTheme;
+  }
 } catch (error) {
   console.error("Could not read the saved Greed accent color.", error);
   colorStorageError = "Color changes may not be saved in this browser.";
+  themeStorageError = "Theme changes may not be saved in this browser.";
 }
 
 document.documentElement.style.setProperty("--greed-color", greedColor);
+if (greedTheme !== "greed") {
+  document.documentElement.dataset.greedTheme = greedTheme;
+}
+
+function applyTheme(themeId, buttons, status) {
+  greedTheme = themeId;
+  if (themeId === "greed") {
+    delete document.documentElement.dataset.greedTheme;
+  } else {
+    document.documentElement.dataset.greedTheme = themeId;
+  }
+
+  for (const button of buttons) {
+    button.setAttribute(
+      "aria-pressed",
+      String(button.dataset.greedThemeChoice === themeId),
+    );
+  }
+
+  try {
+    window.localStorage.setItem("greed-theme", themeId);
+    themeStorageError = "";
+  } catch (error) {
+    console.error("Could not save the selected Greed theme.", error);
+    themeStorageError = "This theme is active but could not be saved.";
+  }
+  status.textContent = themeStorageError;
+  syncThemeBackground();
+}
+
+function createThemeVideo(theme) {
+  const video = document.createElement("video");
+  video.className = "greed-theme-video";
+  video.src = new URL(
+    `./assets/icons/greed%20assets/${encodeURIComponent(theme.background)}`,
+    document.baseURI,
+  ).href;
+  video.autoplay = true;
+  video.loop = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "metadata";
+  video.setAttribute("aria-hidden", "true");
+  video.tabIndex = -1;
+  return video;
+}
+
+function syncThemeBackground() {
+  const theme = greedThemes.find((candidate) => candidate.id === greedTheme);
+  const videoTheme =
+    theme && /\.(mp4|webm|ogg)$/i.test(theme.background) ? theme : null;
+  const containers = document.querySelectorAll(
+    ".bento-omni, .ax-workspace__empty, .ax-frame",
+  );
+
+  for (const container of containers) {
+    let video = container.querySelector(":scope > .greed-theme-video");
+    const emptyBrowserFrame =
+      container.matches(".ax-frame") &&
+      container.matches(
+        ':has(> .ax-frame__view[title="Browser tab"]:not([src]))',
+      );
+    if (!videoTheme || (container.matches(".ax-frame") && !emptyBrowserFrame)) {
+      video?.remove();
+      continue;
+    }
+
+    if (!video) {
+      video = createThemeVideo(videoTheme);
+      container.prepend(video);
+    } else if (!video.src.endsWith(encodeURIComponent(videoTheme.background))) {
+      video.src = new URL(
+        `./assets/icons/greed%20assets/${encodeURIComponent(videoTheme.background)}`,
+        document.baseURI,
+      ).href;
+    }
+  }
+}
 
 function applyColor(red, green, blue, preview, output) {
   const channels = [red, green, blue].map((input) =>
@@ -127,6 +246,92 @@ function createColorPanel() {
   return panel;
 }
 
+function createThemePanel() {
+  const panel = document.createElement("section");
+  panel.className = "greed-theme-panel";
+  panel.setAttribute("aria-label", "Greed Unblocker themes");
+
+  const heading = document.createElement("h3");
+  heading.className = "greed-color-panel__heading";
+  heading.textContent = "Themes";
+
+  const description = document.createElement("p");
+  description.className = "greed-color-panel__description";
+  description.textContent = "Choose a background and logo.";
+
+  const options = document.createElement("div");
+  options.className = "greed-theme-options";
+  options.setAttribute("role", "group");
+  options.setAttribute("aria-label", "Choose a theme");
+
+  const status = document.createElement("p");
+  status.className = "greed-color-panel__error";
+  status.setAttribute("role", "status");
+  status.textContent = themeStorageError;
+
+  const buttons = greedThemes.map((theme) => {
+    const button = document.createElement("button");
+    button.className = "greed-theme-option";
+    button.type = "button";
+    button.dataset.greedThemeChoice = theme.id;
+    button.setAttribute("aria-pressed", String(greedTheme === theme.id));
+
+    const preview = document.createElement("span");
+    preview.className = "greed-theme-option__preview";
+    preview.setAttribute("aria-hidden", "true");
+    const previewBackground = document.createElement("span");
+    previewBackground.className = "greed-theme-option__background";
+    const previewLogo = document.createElement("span");
+    previewLogo.className = "greed-theme-option__logo";
+    const logoUrl = new URL(
+      `./assets/icons/greed%20assets/${encodeURIComponent(theme.logo)}`,
+      document.baseURI,
+    );
+    const backgroundUrl = new URL(
+      `./assets/icons/greed%20assets/${encodeURIComponent(theme.background)}`,
+      document.baseURI,
+    );
+    previewLogo.style.setProperty(
+      "--greed-theme-option-logo",
+      `url("${logoUrl.href}")`,
+    );
+    if (/\.(mp4|webm|ogg)$/i.test(theme.background)) {
+      const video = document.createElement("video");
+      video.src = backgroundUrl.href;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.setAttribute("aria-hidden", "true");
+      video.tabIndex = -1;
+      previewBackground.append(video);
+    } else {
+      previewBackground.style.setProperty(
+        "--greed-theme-option-background",
+        `url("${backgroundUrl.href}")`,
+      );
+    }
+    preview.append(previewBackground, previewLogo);
+
+    const name = document.createElement("span");
+    name.className = "greed-theme-option__name";
+    name.textContent = theme.name;
+
+    const detail = document.createElement("span");
+    detail.className = "greed-theme-option__description";
+    detail.textContent = theme.description;
+
+    button.append(preview, name, detail);
+    button.addEventListener("click", () => applyTheme(theme.id, buttons, status));
+    options.append(button);
+    return button;
+  });
+
+  panel.append(heading, description, options, status);
+  return panel;
+}
+
 function syncAppearancePanel() {
   const heading = document.querySelector(".settings-panel-head__title");
   const content = heading?.closest(".settings-content__inner");
@@ -135,29 +340,39 @@ function syncAppearancePanel() {
     document
       .querySelector(".settings-content__inner[data-greed-appearance]")
       ?.removeAttribute("data-greed-appearance");
+    document.querySelector(".greed-theme-panel")?.remove();
     document.querySelector(".greed-color-panel")?.remove();
     return;
   }
 
   content.setAttribute("data-greed-appearance", "");
-  if (summary && summary.textContent !== "Choose an RGB color for Greed Unblocker's highlights.") {
-    summary.textContent = "Choose an RGB color for Greed Unblocker's highlights.";
+  if (summary && summary.textContent !== "Choose a theme and RGB accent color.") {
+    summary.textContent = "Choose a theme and RGB accent color.";
   }
   for (const name of document.querySelectorAll(".settings-nav__item-name")) {
     if (name.textContent.trim() === "Appearance") {
       const description = name.nextElementSibling;
-      if (description && description.textContent !== "Greed Unblocker accent color") {
-        description.textContent = "Greed Unblocker accent color";
+      if (description && description.textContent !== "Themes and accent color") {
+        description.textContent = "Themes and accent color";
       }
     }
+  }
+
+  let themePanel = content.querySelector(":scope > .greed-theme-panel");
+  if (!themePanel) {
+    themePanel = createThemePanel();
+  }
+  const panelHeading = heading.parentElement.parentElement;
+  if (panelHeading.nextElementSibling !== themePanel) {
+    panelHeading.insertAdjacentElement("afterend", themePanel);
   }
 
   let panel = content.querySelector(":scope > .greed-color-panel");
   if (!panel) {
     panel = createColorPanel();
   }
-  if (heading.parentElement.parentElement.nextElementSibling !== panel) {
-    heading.parentElement.parentElement.insertAdjacentElement("afterend", panel);
+  if (themePanel.nextElementSibling !== panel) {
+    themePanel.insertAdjacentElement("afterend", panel);
   }
 }
 
@@ -221,122 +436,171 @@ function syncPrimaryNavigation() {
   }
 }
 
-function updateDeveloperTools(panel) {
-  const activeTab = document.querySelector('.ax-tab[aria-selected="true"]');
-  const addressInput = document.querySelector(
-    ".ax-address__input[aria-label='Address and search']",
-  );
-  const activeFrame = document.querySelector(
-    ".ax-frame--active .ax-frame__view",
-  );
-  const frameStatus = document.querySelector(
-    ".ax-frame--active .ax-frame__phase",
-  );
-  const values = {
-    title:
-      activeTab?.querySelector(".ax-tab__label")?.textContent.trim() ||
-      activeTab?.getAttribute("title") ||
-      "New tab",
-    address:
-      addressInput?.dataset.grdlAddress ||
-      addressInput?.value.trim() ||
-      "about:blank",
-    status:
-      frameStatus?.textContent.trim() ||
-      (activeFrame?.getAttribute("src") ? "Frame active" : "Idle"),
-  };
+function createDeveloperToolsPanel() {
+  const panel = document.createElement("section");
+  panel.id = "greed-devtools-panel";
+  panel.className = "greed-devtools";
+  panel.hidden = true;
+  panel.setAttribute("role", "region");
+  panel.setAttribute("aria-label", "Greed developer tools");
 
-  for (const [key, value] of Object.entries(values)) {
-    const output = panel.querySelector(`[data-wrath-value="${key}"]`);
-    if (output && output.textContent !== value) output.textContent = value;
-  }
+  const header = document.createElement("header");
+  header.className = "greed-devtools__header";
+  const title = document.createElement("h2");
+  title.textContent = "Greed Developer Tools";
+  const close = document.createElement("button");
+  close.className = "greed-devtools__close";
+  close.type = "button";
+  close.setAttribute("aria-label", "Close Greed developer tools");
+  close.textContent = "×";
+  header.append(title, close);
+
+  const status = document.createElement("p");
+  status.className = "greed-devtools__status";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  status.textContent =
+    "Inspecting Greed Unblocker. Embedded websites run in isolated frames.";
+
+  const retry = document.createElement("button");
+  retry.className = "greed-devtools__retry";
+  retry.type = "button";
+  retry.hidden = true;
+  retry.textContent = "Retry loading developer tools";
+
+  const host = document.createElement("div");
+  host.className = "greed-devtools__eruda";
+
+  panel.append(header, status, retry, host);
+  return { panel, close, status, retry, host };
+}
+
+function loadEruda(host, status, retry) {
+  const initializedEruda = window.eruda;
+  if (initializedEruda?._isInit) return Promise.resolve(initializedEruda);
+  if (erudaLoadPromise) return erudaLoadPromise;
+
+  status.textContent = "Loading Greed Developer Tools...";
+  retry.hidden = true;
+  erudaLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = erudaScriptUrl;
+    script.integrity = erudaScriptIntegrity;
+    script.crossOrigin = "anonymous";
+    script.referrerPolicy = "no-referrer";
+    script.async = true;
+    script.addEventListener(
+      "load",
+      () => {
+        try {
+          const eruda = window.eruda;
+          if (!eruda) throw new Error("The Eruda library did not initialize.");
+          eruda.init({
+            container: host,
+            tool: [
+              "console",
+              "elements",
+              "network",
+              "resources",
+              "sources",
+              "info",
+              "snippets",
+            ],
+            autoScale: true,
+            inline: true,
+            useShadowDom: false,
+            defaults: {
+              displaySize: 100,
+              theme: "Dark",
+              transparency: 1,
+            },
+          });
+          host.style.cssText =
+            "all:initial;display:block;position:relative;width:100%;height:100%;min-height:0;flex:1;overflow:hidden";
+          status.textContent =
+            "Inspecting Greed Unblocker. Embedded websites run in isolated frames.";
+          resolve(eruda);
+        } catch (error) {
+          reject(error);
+        }
+      },
+      { once: true },
+    );
+    script.addEventListener(
+      "error",
+      () => reject(new Error("Could not load Eruda from jsDelivr.")),
+      { once: true },
+    );
+    document.head.append(script);
+  }).catch((error) => {
+    erudaLoadPromise = undefined;
+    console.error("Could not load Greed developer tools.", error);
+    status.textContent =
+      error instanceof Error ? error.message : "Could not load developer tools.";
+    retry.hidden = false;
+    throw error;
+  });
+  return erudaLoadPromise;
 }
 
 function setDeveloperToolsOpen(open) {
-  const panel = document.querySelector("#wrath-devtools-panel");
+  const panel = document.querySelector("#greed-devtools-panel");
   if (!panel) return;
 
   panel.hidden = !open;
   document
     .querySelector("[data-wrath-devtools-toggle]")
     ?.setAttribute("aria-expanded", String(open));
-  if (open) updateDeveloperTools(panel);
-}
+  if (!open) return;
 
-function createDeveloperToolsPanel() {
-  const panel = document.createElement("section");
-  panel.id = "wrath-devtools-panel";
-  panel.className = "wrath-devtools";
-  panel.hidden = true;
-  panel.setAttribute("role", "region");
-  panel.setAttribute("aria-label", "Developer tools");
+  const status = panel.querySelector(".greed-devtools__status");
+  const retry = panel.querySelector(".greed-devtools__retry");
+  const host = panel.querySelector(".greed-devtools__eruda");
+  if (!status || !retry || !host) return;
 
-  const header = document.createElement("header");
-  header.className = "wrath-devtools__header";
-  const title = document.createElement("h2");
-  title.textContent = "Developer tools";
-  const close = document.createElement("button");
-  close.className = "wrath-devtools__close";
-  close.type = "button";
-  close.setAttribute("aria-label", "Close developer tools");
-  close.textContent = "×";
-  close.addEventListener("click", () => setDeveloperToolsOpen(false));
-  header.append(title, close);
-
-  const details = document.createElement("dl");
-  details.className = "wrath-devtools__details";
-  for (const [key, label] of [
-    ["title", "Active tab"],
-    ["address", "Address"],
-    ["status", "Frame status"],
-  ]) {
-    const row = document.createElement("div");
-    row.className = "wrath-devtools__row";
-    const term = document.createElement("dt");
-    term.textContent = label;
-    const value = document.createElement("dd");
-    value.dataset.wrathValue = key;
-    row.append(term, value);
-    details.append(row);
-  }
-
-  const note = document.createElement("p");
-  note.className = "wrath-devtools__note";
-  note.textContent =
-    "Web pages run in isolated frames. This panel shows browser-visible tab information only.";
-  panel.append(header, details, note);
-  return panel;
+  void loadEruda(host, status, retry)
+    .then((eruda) => {
+      if (!panel.hidden) eruda.show();
+    })
+    .catch((error) => {
+      console.error("Could not open Greed developer tools.", error);
+      status.textContent =
+        error instanceof Error ? error.message : "Could not open developer tools.";
+      retry.hidden = false;
+    });
 }
 
 function syncDeveloperTools() {
   const menu = document.querySelector(".ax-address__menu-wrap");
   if (!menu) return;
 
-  let panel = document.querySelector("#wrath-devtools-panel");
-  if (!panel) {
-    panel = createDeveloperToolsPanel();
-    document.body.append(panel);
+  let elements = document.querySelector("#greed-devtools-panel");
+  if (!elements) {
+    elements = createDeveloperToolsPanel();
+    document.body.append(elements.panel);
+    elements.close.addEventListener("click", () => setDeveloperToolsOpen(false));
+    elements.retry.addEventListener("click", () =>
+      setDeveloperToolsOpen(true),
+    );
   }
 
   let toggle = menu.querySelector("[data-wrath-devtools-toggle]");
   if (!toggle) {
     toggle = document.createElement("button");
-    toggle.className = "ax-address__icon-btn wrath-devtools__toggle";
+    toggle.className = "ax-address__icon-btn greed-devtools__toggle";
     toggle.type = "button";
     toggle.dataset.wrathDevtoolsToggle = "true";
-    toggle.setAttribute("aria-label", "Developer tools");
-    toggle.setAttribute("aria-controls", panel.id);
-    toggle.setAttribute("aria-expanded", String(!panel.hidden));
-    toggle.title = "Developer tools";
+    toggle.setAttribute("aria-label", "Greed developer tools");
+    toggle.setAttribute("aria-controls", elements.panel.id);
+    toggle.setAttribute("aria-expanded", String(!elements.panel.hidden));
+    toggle.title = "Greed developer tools";
     toggle.textContent = "";
     toggle.addEventListener("click", () =>
-      setDeveloperToolsOpen(panel.hidden),
+      setDeveloperToolsOpen(elements.panel.hidden),
     );
     const moreActions = menu.querySelector('[aria-label="More actions"]');
     menu.insertBefore(toggle, moreActions ?? null);
   }
-
-  if (!panel.hidden) updateDeveloperTools(panel);
 }
 
 function displayAddress(input) {
@@ -729,6 +993,7 @@ function applyRebrand() {
 
   updateFooter();
   syncAppearancePanel();
+  syncThemeBackground();
   syncBrowserAddressBar();
   syncBrowserDirectOpen();
   syncContextMenu();

@@ -50,45 +50,13 @@ catalogView.className = "greed-games-catalog";
 const grid = document.createElement("div");
 grid.className = "greed-games-panel__grid";
 
-const player = document.createElement("section");
-player.className = "greed-games-player";
-player.hidden = true;
-const playerHeader = document.createElement("header");
-playerHeader.className = "greed-games-player__header";
-const catalogButton = document.createElement("button");
-catalogButton.className = "greed-games-panel__back";
-catalogButton.type = "button";
-catalogButton.textContent = "Back to games";
-const gameTitle = document.createElement("h2");
-gameTitle.className = "greed-games-player__title";
-const fullscreenButton = document.createElement("button");
-fullscreenButton.className = "greed-games-panel__back";
-fullscreenButton.type = "button";
-fullscreenButton.textContent = "Fullscreen";
-playerHeader.append(catalogButton, gameTitle, fullscreenButton);
-const playerStatus = document.createElement("p");
-playerStatus.className = "greed-games-panel__status";
-playerStatus.setAttribute("role", "status");
-playerStatus.setAttribute("aria-live", "polite");
-const gameFrame = document.createElement("iframe");
-gameFrame.className = "greed-games-player__frame";
-gameFrame.title = "Game";
-gameFrame.allow =
-  "autoplay; fullscreen; gamepad; clipboard-read; clipboard-write";
-gameFrame.setAttribute(
-  "sandbox",
-  "allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-scripts allow-same-origin",
-);
-gameFrame.referrerPolicy = "no-referrer";
-gameFrame.allowFullscreen = true;
-player.append(playerHeader, playerStatus, gameFrame);
-
 const credit = document.createElement("p");
 credit.className = "greed-games-panel__credit";
-credit.textContent = "Catalog from Selenite, a game source used by Lyra.";
+credit.textContent =
+  "Choose a game to load it in Greed's browser through the relay.";
 
 catalogView.append(search, status, retryButton, grid);
-content.append(header, catalogView, player, credit);
+content.append(header, catalogView, credit);
 panel.append(content);
 document.body.append(panel);
 
@@ -176,21 +144,40 @@ function renderGames() {
     : "No games match your search.";
 }
 
-function openGame(game) {
-  catalogView.hidden = true;
-  player.hidden = false;
-  gameTitle.textContent = game.name;
-  gameFrame.title = game.name;
-  playerStatus.textContent = `Loading ${game.name}...`;
-  gameFrame.src = game.gameUrl;
-  catalogButton.focus();
-}
+function openGame(game, attempt = 0) {
+  const address = document.querySelector(
+    ".ax-address__input[aria-label='Address and search']",
+  );
+  const form = address?.closest("form");
+  if (
+    !(address instanceof HTMLInputElement) ||
+    !(form instanceof HTMLFormElement)
+  ) {
+    if (attempt < 20) {
+      status.textContent = `Opening ${game.name} in Greed's browser...`;
+      if (location.hash !== "#/browser") location.hash = "#/browser";
+      window.requestAnimationFrame(() => openGame(game, attempt + 1));
+      return;
+    }
 
-function returnToCatalog() {
-  gameFrame.removeAttribute("src");
-  player.hidden = true;
-  catalogView.hidden = false;
-  search.focus();
+    console.error(
+      "Could not open a game because the Greed browser is unavailable.",
+    );
+    status.textContent = "The Greed browser is not ready. Try again shortly.";
+    return;
+  }
+
+  address.value = game.gameUrl;
+  address.dispatchEvent(new Event("input", { bubbles: true }));
+  queueMicrotask(() => {
+    try {
+      form.requestSubmit();
+      closePanel();
+    } catch (error) {
+      console.error(`Could not load ${game.name} in the Greed browser.`, error);
+      status.textContent = `Could not load ${game.name}. Try again shortly.`;
+    }
+  });
 }
 
 async function loadCatalog() {
@@ -226,7 +213,6 @@ async function loadCatalog() {
 }
 
 function closePanel() {
-  returnToCatalog();
   panel.hidden = true;
   document.body.classList.remove("greed-games-open");
   document.querySelector("#greed-root")?.removeAttribute("aria-hidden");
@@ -284,23 +270,9 @@ document.addEventListener(
 );
 
 backButton.addEventListener("click", closePanel);
-catalogButton.addEventListener("click", returnToCatalog);
 retryButton.addEventListener("click", () => void loadCatalog());
-fullscreenButton.addEventListener("click", async () => {
-  try {
-    await gameFrame.requestFullscreen();
-  } catch (error) {
-    console.error("Could not switch the Greed game player to fullscreen.", error);
-    playerStatus.textContent = "Fullscreen is not available in this browser.";
-  }
-});
-gameFrame.addEventListener("load", () => {
-  playerStatus.textContent =
-    "Game frame loaded. If it stays blank, return to the catalog and try another title.";
-});
 search.addEventListener("input", renderGames);
 panel.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
-  if (!player.hidden) returnToCatalog();
-  else closePanel();
+  closePanel();
 });
