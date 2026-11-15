@@ -9,7 +9,7 @@ const footerMessages = [
 const labelReplacements = new Map([
   ["AI", "GREEDGPT"],
   ["Browser", "Grave"],
-  ["G@mes", "gs5"],
+  ["G@mes", "gS5"],
 ]);
 
 let footerIndex = 0;
@@ -183,6 +183,33 @@ function syncAiBranding() {
   }
 }
 
+function syncGamesBranding() {
+  for (const element of document.querySelectorAll(
+    ".home-arcade-tile-title, .home-arcade-tile-sub, .arcade-title, .arcade-count, .arcade-status-text",
+  )) {
+    const text = element.textContent.replace(/g@mes/gi, "gS5");
+    if (element.textContent !== text) element.textContent = text;
+  }
+
+  const catalog = document.querySelector(".arcade-catalog");
+  if (catalog?.getAttribute("aria-label") === "G@mes") {
+    catalog.setAttribute("aria-label", "gS5");
+  }
+
+  for (const element of document.querySelectorAll('[aria-label="G@mes results"]')) {
+    element.setAttribute("aria-label", "gS5 results");
+  }
+
+  for (const button of document.querySelectorAll(
+    '.play-surface-btn[aria-label^="Back to "]',
+  )) {
+    const label = button.getAttribute("aria-label");
+    if (label?.includes("G@mes")) {
+      button.setAttribute("aria-label", label.replace("G@mes", "gS5"));
+    }
+  }
+}
+
 function displayAddress(input) {
   if (document.activeElement === input) return;
 
@@ -319,6 +346,7 @@ function applyRebrand() {
   syncAiBranding();
   syncBrowserAddressBar();
   syncBrowserDirectOpen();
+  syncGamesBranding();
   hideChat();
 }
 
