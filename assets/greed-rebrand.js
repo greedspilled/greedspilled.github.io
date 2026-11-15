@@ -6,20 +6,24 @@ const footerMessages = [
 ];
 
 const labelReplacements = new Map([
-  ["Browser", "Wrath"],
+  ["Browser", "Greed"],
+  ["G@mes", "Games"],
 ]);
 const allowedRoutes = new Set(["browser", "settings"]);
+const contextMenuFrames = new WeakSet();
+const contextMenuDocuments = new WeakSet();
 
 let footerIndex = 0;
 let greedColor = "#ffffff";
 let colorStorageError = "";
+let contextMenu;
 const addressInputs = new WeakSet();
 
 try {
   const savedColor = window.localStorage.getItem("greed-accent-color");
   if (/^#[0-9a-f]{6}$/i.test(savedColor ?? "")) greedColor = savedColor;
 } catch (error) {
-  console.error("Could not read the saved Wrath accent color.", error);
+  console.error("Could not read the saved Greed accent color.", error);
   colorStorageError = "Color changes may not be saved in this browser.";
 }
 
@@ -43,7 +47,7 @@ function applyColor(red, green, blue, preview, output) {
     window.localStorage.setItem("greed-accent-color", greedColor);
     colorStorageError = "";
   } catch (error) {
-    console.error("Could not save the Wrath accent color.", error);
+    console.error("Could not save the Greed accent color.", error);
     colorStorageError = "Color changes apply now but could not be saved.";
   }
 }
@@ -51,7 +55,7 @@ function applyColor(red, green, blue, preview, output) {
 function createColorPanel() {
   const panel = document.createElement("section");
   panel.className = "greed-color-panel";
-  panel.setAttribute("aria-label", "Wrath Unblocker accent color");
+  panel.setAttribute("aria-label", "Greed Unblocker accent color");
 
   const heading = document.createElement("div");
   const title = document.createElement("h3");
@@ -60,7 +64,7 @@ function createColorPanel() {
   const description = document.createElement("p");
   description.className = "greed-color-panel__description";
   description.textContent =
-    "Set the color used for Wrath Unblocker's highlights.";
+    "Set the color used for Greed Unblocker's highlights.";
   heading.append(title, description);
   panel.append(heading);
 
@@ -136,14 +140,14 @@ function syncAppearancePanel() {
   }
 
   content.setAttribute("data-greed-appearance", "");
-  if (summary && summary.textContent !== "Choose an RGB color for Wrath Unblocker's highlights.") {
-    summary.textContent = "Choose an RGB color for Wrath Unblocker's highlights.";
+  if (summary && summary.textContent !== "Choose an RGB color for Greed Unblocker's highlights.") {
+    summary.textContent = "Choose an RGB color for Greed Unblocker's highlights.";
   }
   for (const name of document.querySelectorAll(".settings-nav__item-name")) {
     if (name.textContent.trim() === "Appearance") {
       const description = name.nextElementSibling;
-      if (description && description.textContent !== "Wrath Unblocker accent color") {
-        description.textContent = "Wrath Unblocker accent color";
+      if (description && description.textContent !== "Greed Unblocker accent color") {
+        description.textContent = "Greed Unblocker accent color";
       }
     }
   }
@@ -171,6 +175,40 @@ function updateFooter() {
   }, 180);
 }
 
+function replaceLegacyBranding(node) {
+  const replace = (value) => value.replaceAll("Wrath Unblocker", "Greed Unblocker");
+  const replaceElementAttributes = (element) => {
+    for (const name of ["aria-label", "content", "placeholder", "title"]) {
+      const value = element.getAttribute(name);
+      if (value?.includes("Wrath Unblocker")) {
+        element.setAttribute(name, replace(value));
+      }
+    }
+  };
+
+  if (node.nodeType === Node.TEXT_NODE) {
+    const value = node.nodeValue ?? "";
+    if (value.includes("Wrath Unblocker")) node.nodeValue = replace(value);
+    return;
+  }
+  if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+  replaceElementAttributes(node);
+  const walker = document.createTreeWalker(
+    node,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+  );
+  while (walker.nextNode()) {
+    const current = walker.currentNode;
+    if (current.nodeType === Node.TEXT_NODE) {
+      const value = current.nodeValue ?? "";
+      if (value.includes("Wrath Unblocker")) current.nodeValue = replace(value);
+    } else {
+      replaceElementAttributes(current);
+    }
+  }
+}
+
 function enforceBrowserOnly() {
   const route = location.hash.replace(/^#\/?/, "").split("/")[0];
   if (!allowedRoutes.has(route)) location.hash = "#/browser";
@@ -179,7 +217,7 @@ function enforceBrowserOnly() {
 function syncPrimaryNavigation() {
   for (const item of document.querySelectorAll(".greed-greed-list > li")) {
     const label = item.querySelector(".greed-greed-label")?.textContent.trim();
-    item.hidden = label !== "Wrath" && label !== "Settings";
+    item.hidden = label !== "Greed" && label !== "Games" && label !== "Settings";
   }
 }
 
@@ -394,15 +432,279 @@ function syncBrowserDirectOpen() {
   }
 }
 
+function getWebUrl(value, baseUrl) {
+  const url = new URL(value, baseUrl);
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    throw new Error("This action is only available for web links.");
+  }
+  return url.href;
+}
+
+function getDownloadFilename(url, suggestedName, disposition) {
+  let filename = "";
+  const encodedName = disposition?.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
+  const regularName = disposition?.match(/filename\s*=\s*(?:"([^"]+)"|([^;]+))/i);
+  const headerName = encodedName?.[1] || regularName?.[1] || regularName?.[2];
+
+  if (headerName) {
+    try {
+      filename = encodedName ? decodeURIComponent(headerName) : headerName.trim();
+    } catch {
+      filename = "";
+    }
+  }
+
+  if (!filename) filename = suggestedName;
+  const parsedUrl = new URL(url);
+  if (!filename && (parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:")) {
+    const lastSegment = parsedUrl.pathname.split("/").filter(Boolean).at(-1);
+    if (lastSegment) {
+      try {
+        filename = decodeURIComponent(lastSegment);
+      } catch {
+        filename = lastSegment;
+      }
+    }
+  }
+
+  filename = (filename || "download")
+    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_")
+    .trim();
+  return filename && filename !== "." && filename !== ".." ? filename : "download";
+}
+
+async function downloadResource(url, suggestedName, pageWindow) {
+  const resolvedUrl = new URL(url, pageWindow.location.href);
+  let blob;
+  let filename;
+
+  if (resolvedUrl.protocol === "blob:" || resolvedUrl.protocol === "data:") {
+    filename = getDownloadFilename(resolvedUrl.href, suggestedName);
+    const link = document.createElement("a");
+    link.href = resolvedUrl.href;
+    link.download = filename;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    return;
+  } else {
+    getWebUrl(resolvedUrl.href, pageWindow.location.href);
+    const response = await pageWindow.fetch(resolvedUrl.href, {
+      credentials: "include",
+    });
+    if (!response.ok) {
+      throw new Error(`Download failed: server returned HTTP ${response.status}.`);
+    }
+    blob = await response.blob();
+    filename = getDownloadFilename(
+      resolvedUrl.href,
+      suggestedName,
+      response.headers.get("content-disposition"),
+    );
+  }
+
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+}
+
+function closeContextMenu() {
+  if (!contextMenu) return;
+  contextMenu.hidden = true;
+  contextMenu.replaceChildren();
+}
+
+function handleContextMenuKeydown(event) {
+  if (!contextMenu || contextMenu.hidden) return;
+  const items = [...contextMenu.querySelectorAll("button:not(:disabled)")];
+  const currentIndex = items.indexOf(document.activeElement);
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeContextMenu();
+    return;
+  }
+
+  if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    items[(currentIndex + direction + items.length) % items.length]?.focus();
+  }
+}
+
+function openContextMenu(event, frame, pageDocument) {
+  const target = event.target?.nodeType === 1 ? event.target : null;
+  const editable = target?.closest(
+    'input, textarea, select, [contenteditable=""], [contenteditable="true"]',
+  );
+  if (editable) return;
+
+  const link = target?.closest("a[href]");
+  const image = target?.closest("img");
+  const pageWindow = pageDocument.defaultView;
+  if (!pageWindow) return;
+  const activeFrame = frame || document.querySelector(".ax-frame--active .ax-frame__view");
+  const navigationWindow = frame ? pageWindow : activeFrame?.contentWindow;
+
+  const actions = [];
+  const addAction = (label, action, keepOpen = false) => {
+    actions.push({ label, action, keepOpen });
+  };
+  const addOpenAction = (label, url) => {
+    try {
+      const href = getWebUrl(url, pageDocument.baseURI);
+      addAction(label, () => window.open(href, "_blank", "noopener,noreferrer"));
+    } catch {
+      return;
+    }
+  };
+
+  if (link) {
+    addOpenAction("Open link in new tab", link.href);
+    addAction("Download linked file", () =>
+      downloadResource(link.href, link.download, pageWindow), true);
+    addAction("Copy link address", () =>
+      navigator.clipboard.writeText(link.href));
+  }
+
+  if (image) {
+    addOpenAction("Open image in new tab", image.currentSrc || image.src);
+    addAction("Download image", () =>
+      downloadResource(image.currentSrc || image.src, image.alt, pageWindow), true);
+    addAction("Copy image address", () =>
+      navigator.clipboard.writeText(image.currentSrc || image.src));
+  }
+
+  const selection = pageWindow.getSelection()?.toString().trim();
+  if (selection) {
+    addAction("Copy selected text", () =>
+      navigator.clipboard.writeText(selection));
+  }
+
+  if (navigationWindow) {
+    addAction("Back", () => navigationWindow.history.back());
+    addAction("Forward", () => navigationWindow.history.forward());
+    addAction("Reload page", () => navigationWindow.location.reload());
+    const address = document.querySelector(
+      ".ax-address__input[aria-label='Address and search']",
+    );
+    const currentAddress = address?.dataset.grdlAddress || address?.value.trim();
+    if (currentAddress) {
+      addAction("Copy current address", () =>
+        navigator.clipboard.writeText(currentAddress));
+    }
+  } else if (!frame) {
+    addAction("Reload Greed", () => window.location.reload());
+    addAction("Copy page address", () =>
+      navigator.clipboard.writeText(window.location.href));
+  }
+
+  if (actions.length === 0) return;
+
+  event.preventDefault();
+  if (!contextMenu) {
+    contextMenu = document.createElement("div");
+    contextMenu.className = "wrath-context-menu";
+    contextMenu.setAttribute("role", "menu");
+    contextMenu.setAttribute("aria-label", "Page actions");
+    document.body.append(contextMenu);
+  }
+
+  const status = document.createElement("p");
+  status.className = "wrath-context-menu__status";
+  status.setAttribute("role", "status");
+  status.hidden = true;
+  contextMenu.replaceChildren();
+
+  for (const { label, action, keepOpen } of actions) {
+    const button = document.createElement("button");
+    button.className = "wrath-context-menu__item";
+    button.type = "button";
+    button.setAttribute("role", "menuitem");
+    button.textContent = label;
+    button.addEventListener("click", async () => {
+      try {
+        await action();
+        if (keepOpen) {
+          status.textContent = "Download started.";
+          status.hidden = false;
+        } else {
+          closeContextMenu();
+        }
+      } catch (error) {
+        console.error(`Could not ${label.toLowerCase()}.`, error);
+        status.textContent =
+          error instanceof Error ? error.message : `Could not ${label.toLowerCase()}.`;
+        status.hidden = false;
+      }
+    });
+    contextMenu.append(button);
+  }
+  contextMenu.append(status);
+  contextMenu.hidden = false;
+
+  const frameBounds = frame?.getBoundingClientRect();
+  const scaleX =
+    frameBounds && frame.clientWidth ? frameBounds.width / frame.clientWidth : 1;
+  const scaleY =
+    frameBounds && frame.clientHeight ? frameBounds.height / frame.clientHeight : 1;
+  const left = frameBounds ? frameBounds.left + event.clientX * scaleX : event.clientX;
+  const top = frameBounds ? frameBounds.top + event.clientY * scaleY : event.clientY;
+  contextMenu.style.left = `${Math.max(8, Math.min(left, window.innerWidth - contextMenu.offsetWidth - 8))}px`;
+  contextMenu.style.top = `${Math.max(8, Math.min(top, window.innerHeight - contextMenu.offsetHeight - 8))}px`;
+  contextMenu.querySelector("button")?.focus();
+}
+
+function syncContextMenu() {
+  if (!contextMenuDocuments.has(document)) {
+    contextMenuDocuments.add(document);
+    document.addEventListener(
+      "contextmenu",
+      (event) => openContextMenu(event, null, document),
+      true,
+    );
+    document.addEventListener("pointerdown", (event) => {
+      if (!contextMenu?.contains(event.target)) closeContextMenu();
+    });
+    document.addEventListener("keydown", handleContextMenuKeydown);
+  }
+
+  for (const frame of document.querySelectorAll("iframe.ax-frame__view")) {
+    if (contextMenuFrames.has(frame)) continue;
+    contextMenuFrames.add(frame);
+    const bindDocument = () => {
+      const pageDocument = frame.contentDocument;
+      if (!pageDocument || contextMenuDocuments.has(pageDocument)) return;
+      contextMenuDocuments.add(pageDocument);
+      pageDocument.addEventListener(
+        "contextmenu",
+        (event) => openContextMenu(event, frame, pageDocument),
+        true,
+      );
+      pageDocument.addEventListener("pointerdown", (event) => {
+        if (!contextMenu?.contains(event.target)) closeContextMenu();
+      });
+      pageDocument.addEventListener("keydown", handleContextMenuKeydown);
+    };
+    frame.addEventListener("load", bindDocument);
+    bindDocument();
+  }
+}
+
 function applyRebrand() {
   enforceBrowserOnly();
-  if (document.title !== "Wrath Unblocker") {
-    document.title = "Wrath Unblocker";
+  if (document.title !== "Greed Unblocker") {
+    document.title = "Greed Unblocker";
   }
 
   for (const wordmark of document.querySelectorAll(".wordmark-text")) {
-    if (wordmark.textContent !== "Wrath Unblocker") {
-      wordmark.textContent = "Wrath Unblocker";
+    if (wordmark.textContent !== "Greed Unblocker") {
+      wordmark.textContent = "Greed Unblocker";
     }
   }
 
@@ -429,20 +731,31 @@ function applyRebrand() {
   syncAppearancePanel();
   syncBrowserAddressBar();
   syncBrowserDirectOpen();
+  syncContextMenu();
   syncPrimaryNavigation();
   syncDeveloperTools();
 }
 
-const observer = new MutationObserver(() => {
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    if (mutation.type === "characterData" || mutation.type === "attributes") {
+      replaceLegacyBranding(mutation.target);
+    } else {
+      for (const node of mutation.addedNodes) replaceLegacyBranding(node);
+    }
+  }
   window.requestAnimationFrame(applyRebrand);
 });
 
 observer.observe(document.documentElement, {
+  attributes: true,
+  attributeFilter: ["aria-label", "content", "placeholder", "title"],
   childList: true,
   characterData: true,
   subtree: true,
 });
 
+replaceLegacyBranding(document.documentElement);
 applyRebrand();
 window.addEventListener("hashchange", enforceBrowserOnly);
 

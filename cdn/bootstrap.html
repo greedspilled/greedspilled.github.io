@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
-    <meta name="description" content="Wrath Unblocker, a browser for the web." />
-    <title>Wrath Unblocker</title>
+    <meta name="description" content="Greed Unblocker, a browser for the web." />
+    <title>Greed Unblocker</title>
     <link rel="icon" href="../assets/icons/greed%20assets/logo.png" type="image/png" />
     <style>
       html,
@@ -34,14 +34,14 @@
         ];
         const frame = document.createElement("iframe");
         frame.allow = "autoplay; fullscreen";
-        frame.title = "Wrath Unblocker";
+        frame.title = "Greed Unblocker";
         frame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:0";
         document.body.append(frame);
 
         const loadNext = () => {
           const source = sources.shift();
           if (!source) {
-            document.body.textContent = "Could not load Wrath Unblocker.";
+            document.body.textContent = "Could not load Greed Unblocker.";
             return;
           }
 
@@ -56,7 +56,7 @@
             })
             .then((html) => {
               if (!html.includes(rootId)) {
-                throw new Error("Wrath Unblocker app root was not found");
+                throw new Error("Greed Unblocker app root was not found");
               }
               const selfUrl = new URL(location.href).href;
               const baseUrl = new URL("..", url).href;

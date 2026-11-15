@@ -63,7 +63,7 @@
   background-image: url("./icons/greed%20assets/browser.jpg");
 }
 
-.greed-greed-list > li:nth-child(4) > .greed-greed-item::before {
+.greed-greed-list > li:nth-child(3) > .greed-greed-item::before {
   background-image: url("./icons/greed%20assets/apps.jpg");
 }
 
@@ -148,7 +148,7 @@
 .ax-workspace__empty::before,
 .ax-frame:has(> .ax-frame__view[title="Browser tab"]:not([src]))::after {
   color: var(--greed-color, #fff);
-  content: "Wrath Unblocker";
+  content: "Greed Unblocker";
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 5vw, 3.5rem);
   font-weight: 700;
@@ -585,4 +585,233 @@ a[href*="tiktok.com"],
   background-size: 22px;
   font-size: 0;
   mix-blend-mode: screen;
+}
+
+.wrath-context-menu {
+  position: fixed;
+  z-index: 10001;
+  display: grid;
+  width: min(240px, calc(100vw - 16px));
+  max-height: min(70vh, 480px);
+  overflow: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 6px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+.wrath-context-menu[hidden] {
+  display: none;
+}
+
+.wrath-context-menu__item {
+  min-height: 38px;
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.wrath-context-menu__item:hover,
+.wrath-context-menu__item:focus-visible {
+  outline: none;
+  background: var(--surface-hover);
+}
+
+.wrath-context-menu__status {
+  margin: 4px 8px;
+  color: var(--danger);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.greed-games-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: clamp(16px, 4vw, 36px);
+  background: var(--bg-base);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+.greed-games-panel[hidden] {
+  display: none;
+}
+
+.greed-games-panel__content {
+  display: flex;
+  width: min(1200px, 100%);
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0 auto;
+}
+
+.greed-games-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.greed-games-panel__heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 42px);
+  letter-spacing: 0.06em;
+}
+
+.greed-games-panel__back {
+  min-height: 40px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 0 14px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+
+.greed-games-panel__search {
+  min-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.greed-games-panel__search:focus-visible,
+.greed-games-panel__back:focus-visible,
+.greed-games-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.greed-games-catalog {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.greed-games-panel__status {
+  min-height: 1.5em;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.greed-games-panel__retry {
+  align-self: flex-start;
+  min-height: 38px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 0 14px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+
+.greed-games-panel__grid {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  align-content: start;
+  gap: 14px;
+  overflow: auto;
+  padding: 2px;
+}
+
+.greed-games-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  background: var(--surface);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition:
+    border-color var(--fx-fast) var(--fx-ease),
+    background var(--fx-fast) var(--fx-ease);
+}
+
+.greed-games-card:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-raised);
+}
+
+.greed-games-card__cover {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  object-fit: cover;
+}
+
+.greed-games-card__name {
+  overflow-wrap: anywhere;
+  font-weight: 600;
+}
+
+.greed-games-player {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.greed-games-player__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.greed-games-player__title {
+  min-width: 0;
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  font-size: clamp(18px, 3vw, 26px);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.greed-games-player__frame {
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: #000;
+}
+
+.greed-games-panel__credit {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
 }
