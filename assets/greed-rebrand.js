@@ -17,7 +17,7 @@ const greedThemes = [
   {
     id: "greed",
     name: "Default (Greed)",
-    description: "Greed's original black and white look.",
+    description: "Greed's original look.",
     logo: "logo.png",
     background: "bacground.gif",
   },
@@ -29,19 +29,36 @@ const greedThemes = [
     background: "singulairty.mp4",
   },
   {
-    id: "wrath",
-    name: "Wrath",
+    id: "Encore",
+    name: "Encore",
     description: "A bold red theme.",
-    logo: "wlogo.png",
-    background: "wrath.MP4",
+    logo: "elogo.png",
+    background: "encore.MP4",
   },
   {
-    id: "honour",
-    name: "Honour",
-    description: "A muted, melancholic sepia theme.",
-    logo: "honour.png",
-    background: "honour.mp4",
+    id: "vainglory",
+    name: "Vainglory",
+    description: "A muted, melancholic sea theme.",
+    logo: "vlogo.png",
+    background: "vainglory.mp4",
   },
+  {
+    id: "Determination",
+    name: "Determination",
+    description: "A determined theme.",
+    logo: "dlogo.png",
+    background: "determination.mp4",
+  }
+  {
+    id:"Wukong",
+    name: "Wukong",
+    description: "A monkey theme.",
+    logo: "wlogo.png",
+    background: "wukong.mp4",
+  }
+
+  
+
 ];
 const contextMenuFrames = new WeakSet();
 const contextMenuDocuments = new WeakSet();
