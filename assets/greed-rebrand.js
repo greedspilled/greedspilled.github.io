@@ -56,6 +56,16 @@ const greedThemes = [
     logo: "wlogo.png",
     background: "wukong.mp4",
   }
+  {
+    id:"eldtrich radiance",
+    name: "Eldtrich Radiance",
+    description: "A eldtrich theme.",
+    logo: "erlogo.png",
+    background: "eldtrich radiance.mp4",
+  }
+  {
+    
+  }
 
   
 
